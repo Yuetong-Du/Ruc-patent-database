@@ -6,16 +6,12 @@
 <div>
     {% if patents %}
     {% for patent in patents %}
-    {% if product.count !=0 %}
     <div class="content-section">
-        <a>Patent Title: {{ patent.patent_title }}</a>
+        <a>helloworld</a>
+        <a>Patent Title: {{ patent.patent_title }}</a><br>
         <a>Patent id : {{ patent.patent_number }}</a><br>
         <a>IPC section: {{ patent.ipc_section }}</a><br>
-        {% if current_user.table_name =="Applicant" %}
-            <a href={{ url_for("add_product",id=product.id) }}>Buy it</a>
-        {% endif %}
     </div>
-    {% endif %}
     {% endfor %}
     {% else %}
     <div class="content-section">
