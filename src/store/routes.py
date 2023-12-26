@@ -1,6 +1,6 @@
 from store import app, db, bcrypt
 from store.forms import *
-from store.models import User, Product, Order, OrderDetail, Applicant, Visitor
+from store.models import *
 from flask import render_template, url_for, request, redirect, flash, abort
 from flask_login import current_user, logout_user, login_user, login_required
 from datetime import datetime
@@ -9,8 +9,8 @@ from datetime import datetime
 @app.route('/')
 @app.route("/home") # home page
 def home():
-    products = Product.query.all()
-    return render_template("home.html", products=products)
+    product = Product.query.all()
+    return render_template("home.html", products=product)
 
 
 @app.route("/register",methods=["GET", 'POST']) # register

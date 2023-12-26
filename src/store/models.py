@@ -1,5 +1,5 @@
 from datetime import datetime
-from store import db, login_manage
+from patent import db, login_manage
 from flask_login import UserMixin
 
 
@@ -57,12 +57,3 @@ class OrderDetail(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey("Product.id"),nullable=False)
 
 
-class Order(db.Model):
-    __tablename__ = "Order"
-    id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.Integer, nullable=False, default=0)
-    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    end_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    total_price =db.Column(db.Float,nullable=False, default=0.00)
-    Applicant_id = db.Column("Applicant_id", db.Integer,db.ForeignKey("Applicant.id"),nullable=False)
-    orderdetails = db.relationship("OrderDetail",backref="order",lazy=True)

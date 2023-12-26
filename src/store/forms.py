@@ -2,12 +2,12 @@ from flask import flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField, FloatField, IntegerField
 from wtforms.validators import DataRequired, EqualTo, ValidationError, Length, Email, InputRequired
-from store.models import Applicant, Visitor
+from store.models import Applicant, Visitor, Inspector
 from flask_login import current_user
 
 
 class RegistrationForm(FlaskForm):
-    role=SelectField("Select role", coerce=str, choices=[("1","Applicant"), ("2","Visitor")])
+    role=SelectField("Select role", coerce=str, choices=[("1","Applicant"), ("2","Visitor"),("3","Inspector")])
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Mail', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=20)])
@@ -19,6 +19,8 @@ class RegistrationForm(FlaskForm):
             table = Applicant
         elif self.role.data == "2":
             table = Visitor
+        elif self.role.data =="3":
+            table = Inspector
         if table.query.filter_by(email=email.data).first():
             raise ValidationError("Duplicate email")
 
