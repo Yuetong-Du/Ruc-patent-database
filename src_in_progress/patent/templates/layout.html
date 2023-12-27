@@ -26,11 +26,10 @@
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
             </div>
-            <!-- Navbar Right Side -->
             <div class="navbar-nav">
                 {% if current_user.is_authenticated %}
                     {% if current_user.table_name == "Applicant" %}
-                        <a class="nav-item nav-link" href="{{ url_for('shopping_cart') }}">Cart</a>
+                        <a class="nav-item nav-link" href="{{ url_for('applicant_apply') }}">Apply for a patent</a>
                         <a class="nav-item nav-link" href="{{ url_for('applicant_account',username=current_user.username) }}">Settings</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% elif current_user.table_name == "Visitor" %}
@@ -38,10 +37,10 @@
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% endif %}
                 {% else %}
-                    <a class="nav-item nav-link" href="{{ url_for('login') }}">Sign in</a>
+                  <a class="nav-item nav-link" href="{{ url_for('login') }}">Sign in</a>
                   <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
                 {% endif %}
-            </div>
+            </div> 
           </div>
         </div>
       </nav>

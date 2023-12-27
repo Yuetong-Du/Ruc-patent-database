@@ -147,5 +147,15 @@ class BeyondInventor(db.Model):
     not_inventors = db.Column(db.Integer)
     inventors = db.Column(db.Integer)
 
-
-
+class GApplication(db.Model):
+    __tablename__ = "g_application_in_progress"
+    applicant_id = db.Column(db.Integer)
+    table_number = db.Column(db.Integer,primary_key=True, autoincrement=True)
+    d_ipc = db.Column(db.Integer, db.CheckConstraint('d_ipc = 0 or d_ipc = 1'))
+    ipc_section = db.Column(db.String(32))
+    patent_type = db.Column(db.String(10), db.CheckConstraint("patent_type IN ('utility', 'design', 'plant', 'reissue')"))
+    patent_application_date = db.Column(db.DateTime)
+    patent_title = db.Column(db.Text)
+    patent_abstract = db.Column(db.Text)
+    wipo_kind = db.Column(db.String(3))
+    status = db.Column(db.Integer)

@@ -82,3 +82,37 @@ class UpdateProductForm(FlaskForm):
     count = IntegerField("Product count", validators=[InputRequired()])
     confirm = IntegerField("Confirm Product count", validators=[InputRequired(), EqualTo("count")])
     submit = SubmitField("Update")
+
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, IntegerField, DateTimeField, TextAreaField, SelectField
+from wtforms.validators import DataRequired, Length, Optional
+
+class GApplicationInProgress(FlaskForm):
+    d_ipc = IntegerField(
+        'D-IPC', 
+        validators=[Optional()]
+    )
+    ipc_section = StringField(
+        'IPC Section', 
+        validators=[DataRequired(), Length(max=32)]
+    )
+    patent_type = SelectField(
+        'Patent Type', 
+        choices=[('utility', 'Utility'), ('design', 'Design'), ('plant', 'Plant'), ('reissue', 'Reissue')],
+        validators=[DataRequired()]
+    )
+    patent_title = TextAreaField(
+        'Patent Title', 
+        validators=[DataRequired()]
+    )
+    patent_abstract = TextAreaField(
+        'Patent Abstract', 
+        validators=[DataRequired()]
+    )
+    wipo_kind = StringField(
+        'WIPO Kind', 
+        validators=[DataRequired(), Length(max=3)]
+    )
+    submit = SubmitField("Submit")
+

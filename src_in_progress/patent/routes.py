@@ -217,3 +217,48 @@ def inspector_detail_manage():
     elif request.method == "GET":
         form.telephone.data = inspector1.telephone
     return render_template("update_visitor.html", form=form)
+
+@app.route("/applicant/apply",methods=["GET","POST"])
+@login_required
+def applicant_apply():
+    if current_user.table_name != "Applicant":
+        abort(403)
+    form = GApplicationInProgress()
+    if form.validate_on_submit():
+        patent_application = GApplication(applicant_id=current_user.table_id)
+        patent_application.d_ipc = form.d_ipc.data
+        patent_application.ipc_section = form.ipc_section.data
+        patent_application.patent_title = form.patent_title.data
+        patent_application.patent_abstract = form.patent_abstract.data
+        patent_application.wipo_kind = form.wipo_kind.data
+        patent_application.patent_application_date = datetime.now()
+        patent_application.status = 1
+        db.session.add(patent_application)
+        db.session.commit()
+        flash("Application submitted successfully","success")
+        return redirect(url_for('home'))
+    elif request.method =="GET":
+        patent_application = GApplication(applicant_id=current_user.table_id)
+        patent_application.d_ipc = form.d_ipc.data
+        patent_application.ipc_section = form.ipc_section.data
+        patent_application.patent_title = form.patent_title.data
+        patent_application.patent_abstract = form.patent_abstract.data
+        patent_application.wipo_kind = form.wipo_kind.data
+        patent_application.patent_application_date = datetime.now()
+        patent_application.status = 1
+        db.session.add(patent_application)
+        db.session.commit()
+    return render_template("applicant_apply.html", form=form)
+
+@app.route("/applicant/orders")
+@login_required
+def applicant_application_manage(): # customer_order_manage
+    if current_user.table_name != "Applicant":
+        abort(403)
+    pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id,status=1).all()
+    rejected_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=2).all()
+    approved_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=3).all()
+    return render_template("applicant_patent_in_progress_manage.html",
+                            pending=pending_patents,
+                            rejected = rejected_patents,
+                            approved = approved_patents)
