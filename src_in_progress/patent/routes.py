@@ -4,7 +4,7 @@ from patent.models import *
 from flask import render_template, url_for, request, redirect, flash, abort
 from flask_login import current_user, logout_user, login_user, login_required
 from datetime import datetime
-
+from sqlalchemy import or_, and_
 
 @app.route('/')
 @app.route("/home") # home page
@@ -294,35 +294,56 @@ def applicant_search(): # customer_order_manage
         inventor = form.inventor.data
 
         query = GPatent.query
+        
         if patent_keyword:
-            query = query.filter(GPatent.patent_title.like(f'%{patent_keyword}%'))
-        #if patent_abstract_keyword:
-         #    query = query.filter(query.patent_abstract.like(f'%{patent_abstract_keyword}%'))
-        # if patent_type:
-           # query = query.filter(patent_type = patent_type)
-        # if ipc_section:
-        #     query = query.filter(ipc_section = ipc_section)
-        # if d_ipc:
-        #     query = query.filter(d_ipc = d_ipc)
-        # if wipo_kind:
-        #     query = query.filter(wipo_kind = wipo_kind)
-        # if inventor:
-        #     query = query.join(GInventorDetailed, GPatent.patent_number == GInventorDetailed.patent_number).filter(
-        #         or_(
-        #             GInventorDetailed.inventor_name1.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name2.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name3.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name4.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name5.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name6.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name7.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name8.like(f'%{inventor}%'),
-        #             GInventorDetailed.inventor_name9.like(f'%{inventor}%')
-        #         )
-        #     )
+            conditions = []
+            if patent_keyword:
+                conditions.append(GPatent.patent_title.like(f'%{patent_keyword}%'))
+            if patent_abstract_keyword:
+                conditions.append(GPatent.patent_abstract.like(f'%{patent_abstract_keyword}%'))
+            if ipc_section:
+                conditions.append(ipc_section = ipc_section)
+            if patent_type:
+                conditions.append(patent_type = patent_type)
+            if d_ipc:
+                conditions.append(d_ipc = d_ipc)
+            if wipo_kind:
+                conditions.append(wipo_kind = wipo_kind)
+            query = query.filter(or_(*conditions))
+        if conditions:
+            query = query.filter(and_(*conditions))
+
+        if inventor:
+            inventor_conditions = (
+                GInventorDetailed.inventor_name1.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name2.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name3.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name4.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name5.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name6.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name7.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name8.like(f'%{inventor}%'),
+                GInventorDetailed.inventor_name9.like(f'%{inventor}%')
+            )
+            conditions.append(or_(*inventor_conditions))
         query = query.limit(100)
         
         return render_template('search_result.html', title='Search Result', result = query)
     return render_template('search_page.html', title='Search',form = form)
+
+
+@app.route("/cite/<id>")
+@login_required
+def cite(id):
+    patent = GPatent.query.filter_by(patent_number=id).first()
+    if patent:
+        patent.num_claims = patent.num_claims + 1 if patent.num_claims else 1
+        db.session.add(patent)
+        db.session.commit()
+        flash("Claimed Successfully!", "success")
+    else:
+        flash("Patent not found.", "danger")
+
+    return redirect(url_for("home"))
 
         
