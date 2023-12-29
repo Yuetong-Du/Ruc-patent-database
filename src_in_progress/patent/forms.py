@@ -123,3 +123,39 @@ class GApplicationInProgress(FlaskForm):
             setattr(self, f'male_flag{i}', SelectField(f'Inventor Gender {i}', choices=[('1', 'Male'), ('0', 'Other')]))
 
     submit = SubmitField("Submit")
+
+class GPatentSearch(FlaskForm):
+
+    d_ipc = SelectField(
+        'D-IPC',
+        choices = [(0,0),(1,1)],
+        validators=[]
+    )
+    ipc_section = StringField(
+        'IPC Section (Maximum Length = 32)', 
+        validators=[Length(max=32)]
+    )
+    patent_type = SelectField(
+        'Patent Type', 
+        choices=[('utility', 'Utility'), ('design', 'Design'), ('plant', 'Plant'), ('reissue', 'Reissue')],
+        validators=[]
+    )
+    patent_keyword = TextAreaField(
+        'Patent Keyword (Require)', 
+        validators=[DataRequired()]
+    )
+    patent_abstract_keyword = TextAreaField(
+        'Patent Abstract', 
+        validators=[]
+    )
+    wipo_kind = StringField(
+        'WIPO Kind (Maximum Length = 3)', 
+        validators=[Length(max=3)]
+    )
+    inventor = StringField(
+        'Inventor Name', 
+        validators=[Length(max=32)]
+    )
+    
+
+    submit = SubmitField("Search")

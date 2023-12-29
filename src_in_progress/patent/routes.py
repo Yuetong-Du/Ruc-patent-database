@@ -255,27 +255,6 @@ def applicant_apply():
 
         # flash("Application submitted successfully","success")
         return redirect(url_for('home'))
-    # elif request.method =="GET":
-    #     patent_application = GApplication(applicant_id=current_user.table_id)
-    #     patent_application.d_ipc = form.d_ipc.data
-    #     patent_application.ipc_section = form.ipc_section.data
-    #     patent_application.patent_title = form.patent_title.data
-    #     patent_application.patent_abstract = form.patent_abstract.data
-    #     patent_application.wipo_kind = form.wipo_kind.data
-    #     patent_application.patent_application_date = datetime.now()
-        
-    #     patent_application.status = 1
-    #     # patent_application.inventor_name1 = form.inventor_name1.data
-    #     for i in range(0, inventor_count):  # 假设最多 9 位发明家
-    #         inventor_name = request.form.get(f'patent_title')
-    #         inventor_gender = request.form.get(f'male_flag{i}')
-    #         flash(inventor_name,"success")
-    #         flash(inventor_gender,"success")
-    #         if inventor_name:
-    #             setattr(patent_application, f'inventor_name{i}', inventor_name)
-    #             setattr(patent_application, f'male_flag{i}', inventor_gender)
-    #     # db.session.add(patent_application)
-    #     # db.session.commit()
     return render_template("applicant_apply.html", form=form)
 
 @app.route("/applicant/application_manage")
@@ -300,15 +279,50 @@ def application_detail(application_table_id):
     return render_template('application_detail.html', title='Application_detail', info=application_info)
 
 
-# @app.route("/applicant/application_detail")
-# @login_required
-# def applicant_application_detail(): # customer_order_manage
-#     if current_user.table_name != "Applicant":
-#         abort(403)
-#     pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id,status=1).all()
-#     rejected_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=2).all()
-#     approved_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=3).all()
-#     return render_template("applicant_patent_in_progress_manage.html",
-#                             pending=pending_patents,
-#                             rejected = rejected_patents,
-#                             approved = approved_patents)
+@app.route("/search",methods=["GET","POST"])
+@login_required
+def applicant_search(): # customer_order_manage
+    
+    form = GPatentSearch()
+    if form.validate_on_submit():
+        d_ipc = form.d_ipc.data
+        ipc_section = form.ipc_section.data
+        patent_type = form.patent_type.data
+        patent_keyword = form.patent_keyword.data
+        patent_abstract_keyword = form.patent_abstract_keyword.data
+        wipo_kind = form.wipo_kind.data
+        inventor = form.inventor.data
+
+        query = GPatent.query
+        if patent_keyword:
+            query = query.filter(GPatent.patent_title.like(f'%{patent_keyword}%'))
+        #if patent_abstract_keyword:
+         #    query = query.filter(query.patent_abstract.like(f'%{patent_abstract_keyword}%'))
+        # if patent_type:
+           # query = query.filter(patent_type = patent_type)
+        # if ipc_section:
+        #     query = query.filter(ipc_section = ipc_section)
+        # if d_ipc:
+        #     query = query.filter(d_ipc = d_ipc)
+        # if wipo_kind:
+        #     query = query.filter(wipo_kind = wipo_kind)
+        # if inventor:
+        #     query = query.join(GInventorDetailed, GPatent.patent_number == GInventorDetailed.patent_number).filter(
+        #         or_(
+        #             GInventorDetailed.inventor_name1.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name2.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name3.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name4.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name5.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name6.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name7.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name8.like(f'%{inventor}%'),
+        #             GInventorDetailed.inventor_name9.like(f'%{inventor}%')
+        #         )
+        #     )
+        query = query.limit(100)
+        
+        return render_template('search_result.html', title='Search Result', result = query)
+    return render_template('search_page.html', title='Search',form = form)
+
+        

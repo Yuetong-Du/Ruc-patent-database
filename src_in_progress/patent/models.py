@@ -60,6 +60,8 @@ class GPatent(db.Model):
     patent_abstract = db.Column(db.Text)
     wipo_kind = db.Column(db.String(3))
     num_claims = db.Column(db.Integer)
+    # inventors = db.relationship('GInventorGeneral', backref='patent', lazy='dynamic')
+    inventors = db.relationship('GInventorDetailed', backref='patent', lazy=True)
 
 class GInventorGeneral(db.Model):
     __tablename__ = "g_inventor_general"
@@ -72,7 +74,7 @@ class GInventorGeneral(db.Model):
 
 class GInventorDetailed(db.Model):
     __tablename__ = "g_inventor_detailed"
-    patent_number = db.Column(db.String(20), primary_key=True)
+    patent_number = db.Column(db.String(20), db.ForeignKey('g_patent.patent_number'), primary_key=True)
     inventor_id1 = db.Column(db.String(128))
     male_flag1 = db.Column(db.Integer)
     inventor_name1 = db.Column(db.String(128))
