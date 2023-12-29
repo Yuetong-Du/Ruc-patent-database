@@ -100,7 +100,6 @@ class GInventorDetailed(db.Model):
     inventor_id9 = db.Column(db.String(128))
     male_flag9 = db.Column(db.Integer)
     inventor_name9 = db.Column(db.String(128))
-    inventors = db.Column(db.Integer)
 
 class GApplication(db.Model):
     __tablename__ = "g_application"
@@ -147,6 +146,8 @@ class BeyondInventor(db.Model):
     not_inventors = db.Column(db.Integer)
     inventors = db.Column(db.Integer)
 
+
+import json
 class GApplication(db.Model):
     __tablename__ = "g_application_in_progress"
     applicant_id = db.Column(db.Integer)
@@ -159,3 +160,21 @@ class GApplication(db.Model):
     patent_abstract = db.Column(db.Text)
     wipo_kind = db.Column(db.String(3))
     status = db.Column(db.Integer)
+    male_flag1 = db.Column(db.Integer)
+    inventor_name1 = db.Column(db.String(128))
+    male_flag2 = db.Column(db.Integer)
+    inventor_name2 = db.Column(db.String(128))
+    male_flag3 = db.Column(db.Integer)
+    inventor_name3 = db.Column(db.String(128))
+    male_flag4 = db.Column(db.Integer)
+    inventor_name4 = db.Column(db.String(128))
+    male_flag5 = db.Column(db.Integer)
+    inventor_name5 = db.Column(db.String(128))
+    male_flag6 = db.Column(db.Integer)
+    inventor_name6 = db.Column(db.String(128))
+    male_flag7 = db.Column(db.Integer)
+    inventor_name7 = db.Column(db.String(128))
+    male_flag8 = db.Column(db.Integer)
+    inventor_name8 = db.Column(db.String(128))
+    male_flag9 = db.Column(db.Integer)
+    inventor_name9 = db.Column(db.String(128))

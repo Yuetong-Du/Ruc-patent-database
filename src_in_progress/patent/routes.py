@@ -223,7 +223,9 @@ def inspector_detail_manage():
 def applicant_apply():
     if current_user.table_name != "Applicant":
         abort(403)
+    inventor_count = sum(1 for key in request.form.keys() if key.startswith('inventor_name'))
     form = GApplicationInProgress()
+    form.add_inventor_fields(inventor_count)
     if form.validate_on_submit():
         patent_application = GApplication(applicant_id=current_user.table_id)
         patent_application.d_ipc = form.d_ipc.data
@@ -232,25 +234,51 @@ def applicant_apply():
         patent_application.patent_abstract = form.patent_abstract.data
         patent_application.wipo_kind = form.wipo_kind.data
         patent_application.patent_application_date = datetime.now()
+        patent_application.patent_type = form.patent_type.data
         patent_application.status = 1
+        inventor_count = sum(1 for key in request.form.keys() if key.startswith('inventor_name'))
+
+        for i in range(1, inventor_count + 1):  # 从 1 开始，直到 inventor_count
+            inventor_name = request.form.get(f'inventor_name{i}')
+            inventor_gender = request.form.get(f'male_flag{i}')
+            if inventor_name:
+                setattr(patent_application, f'inventor_name{i}', inventor_name)
+                setattr(patent_application, f'male_flag{i}', int(inventor_gender))
+
         db.session.add(patent_application)
-        db.session.commit()
-        flash("Application submitted successfully","success")
+        try:
+            db.session.commit()
+            flash("Application submitted successfully", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An error occurred: {e}", "danger")
+
+        # flash("Application submitted successfully","success")
         return redirect(url_for('home'))
-    elif request.method =="GET":
-        patent_application = GApplication(applicant_id=current_user.table_id)
-        patent_application.d_ipc = form.d_ipc.data
-        patent_application.ipc_section = form.ipc_section.data
-        patent_application.patent_title = form.patent_title.data
-        patent_application.patent_abstract = form.patent_abstract.data
-        patent_application.wipo_kind = form.wipo_kind.data
-        patent_application.patent_application_date = datetime.now()
-        patent_application.status = 1
-        db.session.add(patent_application)
-        db.session.commit()
+    # elif request.method =="GET":
+    #     patent_application = GApplication(applicant_id=current_user.table_id)
+    #     patent_application.d_ipc = form.d_ipc.data
+    #     patent_application.ipc_section = form.ipc_section.data
+    #     patent_application.patent_title = form.patent_title.data
+    #     patent_application.patent_abstract = form.patent_abstract.data
+    #     patent_application.wipo_kind = form.wipo_kind.data
+    #     patent_application.patent_application_date = datetime.now()
+        
+    #     patent_application.status = 1
+    #     # patent_application.inventor_name1 = form.inventor_name1.data
+    #     for i in range(0, inventor_count):  # 假设最多 9 位发明家
+    #         inventor_name = request.form.get(f'patent_title')
+    #         inventor_gender = request.form.get(f'male_flag{i}')
+    #         flash(inventor_name,"success")
+    #         flash(inventor_gender,"success")
+    #         if inventor_name:
+    #             setattr(patent_application, f'inventor_name{i}', inventor_name)
+    #             setattr(patent_application, f'male_flag{i}', inventor_gender)
+    #     # db.session.add(patent_application)
+    #     # db.session.commit()
     return render_template("applicant_apply.html", form=form)
 
-@app.route("/applicant/orders")
+@app.route("/applicant/application_manage")
 @login_required
 def applicant_application_manage(): # customer_order_manage
     if current_user.table_name != "Applicant":
@@ -262,3 +290,29 @@ def applicant_application_manage(): # customer_order_manage
                             pending=pending_patents,
                             rejected = rejected_patents,
                             approved = approved_patents)
+
+# @app.route("/applicant/application_detail")
+# @login_required
+# def applicant_application_detail(): # customer_order_manage
+#     if current_user.table_name != "Applicant":
+#         abort(403)
+#     pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id,status=1).all()
+#     rejected_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=2).all()
+#     approved_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=3).all()
+#     return render_template("applicant_patent_in_progress_manage.html",
+#                             pending=pending_patents,
+#                             rejected = rejected_patents,
+#                             approved = approved_patents)
+
+# @app.route("/applicant/application_detail")
+# @login_required
+# def applicant_application_detail(): # customer_order_manage
+#     if current_user.table_name != "Applicant":
+#         abort(403)
+#     pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id,status=1).all()
+#     rejected_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=2).all()
+#     approved_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=3).all()
+#     return render_template("applicant_patent_in_progress_manage.html",
+#                             pending=pending_patents,
+#                             rejected = rejected_patents,
+#                             approved = approved_patents)

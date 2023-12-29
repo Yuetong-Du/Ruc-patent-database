@@ -89,12 +89,14 @@ from wtforms import StringField, IntegerField, DateTimeField, TextAreaField, Sel
 from wtforms.validators import DataRequired, Length, Optional
 
 class GApplicationInProgress(FlaskForm):
-    d_ipc = IntegerField(
-        'D-IPC', 
-        validators=[Optional()]
+
+    d_ipc = SelectField(
+        'D-IPC',
+        choices = [(0,0),(1,1)],
+        validators=[DataRequired()]
     )
     ipc_section = StringField(
-        'IPC Section', 
+        'IPC Section (Maximum Length = 32)', 
         validators=[DataRequired(), Length(max=32)]
     )
     patent_type = SelectField(
@@ -111,8 +113,13 @@ class GApplicationInProgress(FlaskForm):
         validators=[DataRequired()]
     )
     wipo_kind = StringField(
-        'WIPO Kind', 
+        'WIPO Kind (Maximum Length = 3)', 
         validators=[DataRequired(), Length(max=3)]
     )
-    submit = SubmitField("Submit")
 
+    def add_inventor_fields(self, number_of_inventors):
+        for i in range(1, number_of_inventors + 1):
+            setattr(self, f'inventor_name{i}', StringField(f'Inventor Name {i}'))
+            setattr(self, f'male_flag{i}', SelectField(f'Inventor Gender {i}', choices=[('1', 'Male'), ('0', 'Other')]))
+
+    submit = SubmitField("Submit")

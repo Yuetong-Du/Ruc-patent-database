@@ -85,8 +85,43 @@
                 </div>
             </fieldset>
             <div class="form-group">
+                <button type="button" id="add-inventor-button" class="btn btn-secondary">Add Inventor</button>
+            </div>
+            <div id="inventors-container"></div>
+            <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
         </form>
     </div>
+
+    <script>
+        let inventorCount = 1;
+        const maxInventors = 9;
+        document.getElementById('add-inventor-button').addEventListener('click', function() {
+            if (inventorCount < maxInventors) {
+                const container = document.getElementById('inventors-container');
+                const inventorDiv = document.createElement('div');
+                inventorDiv.classList.add('form-group');
+                
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.name = `inventor_name${inventorCount}`;
+                nameInput.placeholder = `Inventor Name ${inventorCount}`;
+                nameInput.classList.add('form-control');
+                inventorDiv.appendChild(nameInput);
+    
+                const genderSelect = document.createElement('select');
+                genderSelect.name = `male_flag${inventorCount}`;
+                genderSelect.classList.add('form-control');
+                const maleOption = new Option('Male', 1);
+                const femaleOption = new Option('Female', 0);
+                genderSelect.options.add(maleOption);
+                genderSelect.options.add(femaleOption);
+                inventorDiv.appendChild(genderSelect);
+    
+                container.appendChild(inventorDiv);
+                inventorCount++;
+            }
+        });
+    </script>
 {% endblock content %}
