@@ -9,6 +9,7 @@
             <font color="blue">
                 <a> Pending</a><br>
             </font>
+            <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
             <a>-------------------------------------------------------</a><br>
         {% endfor %}
     {% endif %}
@@ -20,6 +21,7 @@
                     <font color="red">
                         <a> Rejected</a><br>
                     </font>
+                    <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
                 <a>-------------------------------------------------------</a><br>
         {% endfor %}
     {% endif %}
@@ -31,6 +33,7 @@
                     <font color="green">
                         <a>Approved</a><br>
                     </font>
+                    <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
             <a>-------------------------------------------------------</a><br>
         {% endfor %}
     {% endif %}

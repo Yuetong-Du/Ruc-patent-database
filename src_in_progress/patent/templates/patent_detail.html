@@ -94,11 +94,4 @@
             {% endif %}
         {% endif %}
     </div>
-    {% if current_user.table_name =="Supplier"%}
-        <div class="content-section">
-            <font size="4" color="red" >
-                <a href={{ url_for("confirm_deliver_order",id=order.id) }}>Confirm delivery</a>
-            </font>
-        </div>
-    {% endif %}
 {% endblock content %}

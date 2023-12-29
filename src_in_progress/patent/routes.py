@@ -291,18 +291,14 @@ def applicant_application_manage(): # customer_order_manage
                             rejected = rejected_patents,
                             approved = approved_patents)
 
-# @app.route("/applicant/application_detail")
-# @login_required
-# def applicant_application_detail(): # customer_order_manage
-#     if current_user.table_name != "Applicant":
-#         abort(403)
-#     pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id,status=1).all()
-#     rejected_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=2).all()
-#     approved_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=3).all()
-#     return render_template("applicant_patent_in_progress_manage.html",
-#                             pending=pending_patents,
-#                             rejected = rejected_patents,
-#                             approved = approved_patents)
+@app.route("/applicant/application_detail/<int:application_table_id>")
+@login_required
+def application_detail(application_table_id):
+    if current_user.table_name != "Applicant":
+        abort(403)
+    application_info = GApplication.query.filter_by(table_number=application_table_id).first()
+    return render_template('application_detail.html', title='Application_detail', info=application_info)
+
 
 # @app.route("/applicant/application_detail")
 # @login_required
