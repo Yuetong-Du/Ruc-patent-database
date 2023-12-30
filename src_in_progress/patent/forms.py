@@ -26,7 +26,7 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    role = SelectField("Select role",coerce=str,choices=[("1","Applicant"),("2","Visitor")])
+    role = SelectField("Select role",coerce=str,choices=[("1","Applicant"),("2","Visitor"),("3","Inspector")])
     email = StringField('Mail',validators=[DataRequired(), Email()])
     password = PasswordField('Password',validators=[DataRequired()])
     remember = BooleanField("Remember me")
@@ -66,7 +66,10 @@ class UpdateVisitorForm(FlaskForm):
     telephone = StringField("Telephone", validators=[InputRequired(), Length(max=20, min=9)])
     submit = SubmitField('Update')
 
-
+class UpdateInspectorForm(FlaskForm):
+    # address = StringField('address',validators=[InputRequired(),Length(min=5, max=40)])
+    telephone = StringField("Telephone", validators=[InputRequired(), Length(max=20, min=9)])
+    submit = SubmitField('Update')
 
 class ProductForm(FlaskForm):
     name = StringField('Product name',validators=[DataRequired(), Length(min=2, max=40)])
@@ -128,7 +131,7 @@ class GPatentSearch(FlaskForm):
 
     d_ipc = SelectField(
         'D-IPC',
-        choices = [(0,0),(1,1),('NA','Both')],
+        choices = [('NA','Both'),(0,0),(1,1)],
         validators=[]
     )
     ipc_section = StringField(
@@ -137,7 +140,7 @@ class GPatentSearch(FlaskForm):
     )
     patent_type = SelectField(
         'Patent Type', 
-        choices=[('utility', 'utility'), ('design', 'design'), ('plant', 'plant'), ('reissue', 'reissue'),('NA','Any will be fine!')],
+        choices=[('NA','Any will be fine!'),('utility', 'utility'), ('design', 'design'), ('plant', 'plant'), ('reissue', 'reissue')],
         validators=[]
     )
     patent_keyword = TextAreaField(

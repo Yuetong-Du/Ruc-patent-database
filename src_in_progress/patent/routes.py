@@ -27,7 +27,7 @@ def register():
             table = Visitor
         elif form.role.data == "3":
             role = Inspector()
-            table_name = "Visitor"
+            table_name = "Inspector"
             table = Inspector
         hashed_password = bcrypt.generate_password_hash(password=form.password.data).decode("utf-8")
         role.username = form.username.data
@@ -116,7 +116,7 @@ def inspector_account(username):
     if insepctor1.telephone == "null": # if any of the info is not submitted
         flash("Please complete your personal information as soon as possible","warning")
         return redirect(url_for("inspector_detail_manage"))
-    return render_template("visitor_account.html", username=username)
+    return render_template("inspector_account.html", username=username)
 
 @app.route("/update/info",methods=["GET","POST"])
 @login_required
@@ -208,7 +208,7 @@ def visitor_detail_manage(): # supplier_shipper_manage
 def inspector_detail_manage():
     if current_user.table_name != "Inspector":
         abort(403)
-    form = UpdateVisitorForm()
+    form = UpdateInspectorForm()
     inspector1 = Inspector.query.filter_by(id=current_user.table_id).first() # look for visitor info
     if form.validate_on_submit():
         inspector1.telephone = form.telephone.data
@@ -217,7 +217,7 @@ def inspector_detail_manage():
         flash("Profile updated successfully","success")
     elif request.method == "GET":
         form.telephone.data = inspector1.telephone
-    return render_template("update_visitor.html", form=form)
+    return render_template("update_inspector.html", form=form)
 
 @app.route("/applicant/apply",methods=["GET","POST"])
 @login_required
@@ -365,3 +365,10 @@ def cite(id):
         flash("Patent not found.", "danger")
 
     return redirect(url_for("home"))
+
+# @app.route("/cite/<id>")
+# @login_required
+# def inspector(id):
+
+
+#     return redirect(url_for("home"))

@@ -35,6 +35,9 @@
                     {% elif current_user.table_name == "Visitor" %}
                         <a class="nav-item nav-link" href="{{ url_for('visitor_account',username=current_user.username) }}">Settings</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    {% elif current_user.table_name == "Inspector" %}
+                        <a class="nav-item nav-link" href="{{ url_for('inspector_account',username=current_user.username) }}">Settings</a>
+                        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
                     {% endif %}
                 {% else %}
                   <a class="nav-item nav-link" href="{{ url_for('login') }}">Sign in</a>
