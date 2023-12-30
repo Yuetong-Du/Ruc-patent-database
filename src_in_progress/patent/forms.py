@@ -120,7 +120,7 @@ class GApplicationInProgress(FlaskForm):
     def add_inventor_fields(self, number_of_inventors):
         for i in range(1, number_of_inventors + 1):
             setattr(self, f'inventor_name{i}', StringField(f'Inventor Name {i}'))
-            setattr(self, f'male_flag{i}', SelectField(f'Inventor Gender {i}', choices=[('1', 'Male'), ('0', 'Other')]))
+            setattr(self, f'male_flag{i}', SelectField(f'Inventor Gender {i}', choices=[('1', 'Male'), ('0', 'Female')]))
 
     submit = SubmitField("Submit")
 
@@ -141,7 +141,7 @@ class GPatentSearch(FlaskForm):
         validators=[]
     )
     patent_keyword = TextAreaField(
-        'Patent Keyword (Require)', 
+        'Patent Keyword (Required)', 
         validators=[DataRequired()]
     )
     patent_abstract_keyword = TextAreaField(

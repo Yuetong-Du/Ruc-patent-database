@@ -5,6 +5,7 @@ from flask import render_template, url_for, request, redirect, flash, abort
 from flask_login import current_user, logout_user, login_user, login_required
 from datetime import datetime
 from sqlalchemy import or_, and_
+from flask import session
 
 @app.route('/')
 @app.route("/home") # home page
@@ -279,60 +280,77 @@ def application_detail(application_table_id):
     return render_template('application_detail.html', title='Application_detail', info=application_info)
 
 
-@app.route("/search",methods=["GET","POST"])
+@app.route("/search", methods=["GET", "POST"])
 @login_required
-def applicant_search(number=100): # customer_order_manage
-    
-    form = GPatentSearch()
+def patent_search():
+    form = GPatentSearch()  # 假设您已经创建了这个表单类
     if form.validate_on_submit():
-        d_ipc = form.d_ipc.data
-        ipc_section = form.ipc_section.data
-        patent_type = form.patent_type.data
-        patent_keyword = form.patent_keyword.data
-        patent_abstract_keyword = form.patent_abstract_keyword.data
-        wipo_kind = form.wipo_kind.data
-        inventor = form.inventor.data
+        # 存储搜索参数到会话中
+        session['search_params'] = {
+            'patent_keyword': form.patent_keyword.data,
+            'patent_abstract_keyword': form.patent_abstract_keyword.data,
+            'ipc_section': form.ipc_section.data,
+            'patent_type': form.patent_type.data,
+            'd_ipc': form.d_ipc.data,
+            'wipo_kind': form.wipo_kind.data,
+            'inventor': form.inventor.data
+        }
 
-        query = GPatent.query
-        
-        if patent_keyword:
-            conditions = []
-            if patent_keyword:
-                conditions.append(GPatent.patent_title.like(f'%{patent_keyword}%'))
-            if patent_abstract_keyword:
-                conditions.append(GPatent.patent_abstract.like(f'%{patent_abstract_keyword}%'))
-            if ipc_section:
-                conditions.append(GPatent.ipc_section == ipc_section)
-            if patent_type!="NA":
-                conditions.append(GPatent.patent_type == patent_type)
-            if d_ipc!="NA":
-                conditions.append(GPatent.d_ipc == d_ipc)
-            if wipo_kind:
-                conditions.append(GPatent.wipo_kind == wipo_kind)
-            query = query.filter(or_(*conditions))
-        if conditions:
-            query = query.filter(and_(*conditions))
+        # 重定向到结果显示视图
+        return redirect(url_for('another_100_results', number=100))  # 初始化结果数量为 100
 
-        if inventor:
-            # 为了检索发明家信息，需要连接 GInventorDetailed
+    return render_template('search_page.html', title='Search', form=form)
+
+
+@app.route("/search/plus_100/<int:number>", methods=["GET", "POST"])
+@login_required
+def another_100_results(number):
+    number += 100
+    search_params = session.get('search_params', {})
+    query = GPatent.query
+    conditions = []
+
+    # 构建基于用户输入的搜索条件
+    if search_params.get('patent_keyword'):
+        conditions.append(GPatent.patent_title.like(f'%{search_params["patent_keyword"]}%'))
+    if search_params.get('patent_abstract_keyword'):
+        conditions.append(GPatent.patent_abstract.like(f'%{search_params["patent_abstract_keyword"]}%'))
+    if search_params.get('ipc_section'):
+        conditions.append(GPatent.ipc_section == search_params['ipc_section'])
+    if search_params.get('patent_type') and search_params['patent_type'] != "NA":
+        conditions.append(GPatent.patent_type == search_params['patent_type'])
+    if search_params.get('d_ipc') and search_params['d_ipc'] != "NA":
+        conditions.append(GPatent.d_ipc == search_params['d_ipc'])
+    if search_params.get('wipo_kind'):
+        conditions.append(GPatent.wipo_kind == search_params['wipo_kind'])
+
+    # 应用普通搜索条件
+    if conditions:
+        query = query.filter(and_(*conditions))
+
+    # 构建发明家搜索条件并应用
+    inventor_conditions = []
+    if search_params.get('inventor'):
+        inventor_conditions.extend([
+            GInventorDetailed.inventor_name1.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name2.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name3.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name4.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name5.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name6.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name7.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name8.like(f'%{search_params["inventor"]}%'),
+            GInventorDetailed.inventor_name9.like(f'%{search_params["inventor"]}%')
+        ])
+        if inventor_conditions:
             query = query.join(GInventorDetailed, GPatent.patent_number == GInventorDetailed.patent_number)
-            inventor_conditions = (
-                GInventorDetailed.inventor_name1.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name2.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name3.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name4.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name5.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name6.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name7.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name8.like(f'%{inventor}%'),
-                GInventorDetailed.inventor_name9.like(f'%{inventor}%')
-            )
-            conditions.append(or_(*inventor_conditions))
-        query = query.limit(number)
-        
-        return render_template('search_result.html', title='Search Result', result = query, number = number)
-    return render_template('search_page.html', title='Search',form = form)
+            query = query.filter(or_(*inventor_conditions))
 
+    # 执行查询并限制结果数量
+    query = query.limit(number)
+    results = query.all()
+
+    return render_template('search_result.html', title='Search Result', result=results, number=number)
 
 @app.route("/cite/<id>")
 @login_required
@@ -347,9 +365,3 @@ def cite(id):
         flash("Patent not found.", "danger")
 
     return redirect(url_for("home"))
-
-@app.route("/search",methods=["GET","POST"])
-@login_required
-def another_100_results(number): # customer_order_manage
-    number += 100
-    return redirect(url_for( "applicant_search", number = number))
