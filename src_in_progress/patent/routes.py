@@ -6,12 +6,22 @@ from flask_login import current_user, logout_user, login_user, login_required
 from datetime import datetime
 from sqlalchemy import or_, and_
 from flask import session
+from sqlalchemy import func
 
 @app.route('/')
 @app.route("/home") # home page
 def home():
     first_ten_patents = GPatent.query.limit(10).all()
     return render_template("home.html", patents=first_ten_patents, title = "Home")
+
+@app.route("/dashboard")
+def  dashboard():
+    results = (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
+               .group_by(GLocation.country)
+               .order_by(func.count(GLocation.patent_number).desc())
+               .limit(8)
+               .all())
+    return render_template("dashboard.html",result_left1= results,title="Dashboard")
 
 @app.route("/register",methods=["GET", 'POST']) # register
 def register():
