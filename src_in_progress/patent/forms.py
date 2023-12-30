@@ -128,7 +128,7 @@ class GPatentSearch(FlaskForm):
 
     d_ipc = SelectField(
         'D-IPC',
-        choices = [(0,0),(1,1)],
+        choices = [(0,0),(1,1),('NA','Both')],
         validators=[]
     )
     ipc_section = StringField(
@@ -137,7 +137,7 @@ class GPatentSearch(FlaskForm):
     )
     patent_type = SelectField(
         'Patent Type', 
-        choices=[('utility', 'Utility'), ('design', 'Design'), ('plant', 'Plant'), ('reissue', 'Reissue')],
+        choices=[('utility', 'utility'), ('design', 'design'), ('plant', 'plant'), ('reissue', 'reissue'),('NA','Any will be fine!')],
         validators=[]
     )
     patent_keyword = TextAreaField(

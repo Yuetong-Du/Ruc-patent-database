@@ -302,18 +302,20 @@ def applicant_search(): # customer_order_manage
             if patent_abstract_keyword:
                 conditions.append(GPatent.patent_abstract.like(f'%{patent_abstract_keyword}%'))
             if ipc_section:
-                conditions.append(ipc_section = ipc_section)
-            if patent_type:
-                conditions.append(patent_type = patent_type)
-            if d_ipc:
-                conditions.append(d_ipc = d_ipc)
+                conditions.append(GPatent.ipc_section == ipc_section)
+            if patent_type!="NA":
+                conditions.append(GPatent.patent_type == patent_type)
+            if d_ipc!="NA":
+                conditions.append(GPatent.d_ipc == d_ipc)
             if wipo_kind:
-                conditions.append(wipo_kind = wipo_kind)
+                conditions.append(GPatent.wipo_kind == wipo_kind)
             query = query.filter(or_(*conditions))
         if conditions:
             query = query.filter(and_(*conditions))
 
         if inventor:
+            # 为了检索发明家信息，需要连接 GInventorDetailed
+            query = query.join(GInventorDetailed, GPatent.patent_number == GInventorDetailed.patent_number)
             inventor_conditions = (
                 GInventorDetailed.inventor_name1.like(f'%{inventor}%'),
                 GInventorDetailed.inventor_name2.like(f'%{inventor}%'),
