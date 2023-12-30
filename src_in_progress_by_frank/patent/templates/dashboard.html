@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>疫情监控</title>
+		<style>
+			body {
+				margin: 0;
+				background: #333;
+			}
+
+			#title {
+				position: absolute;
+				width: 40%;
+				height: 10%;
+				top: 0;
+				left: 30%;
+				color: white;
+				font-size: 40px;
+				justify-content: center;
+				display: flex;
+				align-items: center;
+			}
+
+			#time {
+				position: absolute;
+				height: 10%;
+				right: 5%;
+				top: 5%;
+				color: white;
+				font-size: 16px;
+			}
+
+			#c1 {
+				position: absolute;
+				width: 40%;
+				height: 25%;
+				top: 10%;
+				left: 30%;
+				color: white;
+				background: #777777;
+			}
+
+			#c2 {
+				position: absolute;
+				width: 40%;
+				height: 65%;
+				top: 35%;
+				left: 30%;
+				background: #888888;
+			}
+
+			#l1 {
+				position: absolute;
+				width: 30%;
+				height: 45%;
+				top: 10%;
+				left: 0%;
+				background: #666666;
+			}
+
+			#l2 {
+				position: absolute;
+				width: 30%;
+				height: 45%;
+				top: 55%;
+				left: 0%;
+				background: #333;
+			}
+
+			#r1 {
+				position: absolute;
+				width: 30%;
+				height: 45%;
+				top: 10%;
+				right: 0%;
+				background: #666666;
+			}
+
+			#r2 {
+				position: absolute;
+				width: 30%;
+				height: 45%;
+				top: 55%;
+				right: 0%;
+				background: #333;
+			}
+		</style>
+		<script>
+            var datetime = new Date();
+            console.log(datetime);
+            document.getElementById("time").textContent = datetime; //it will print on html page
+        </script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	</head>
+	<body>
+		<div id="title">专利数据看板</div>
+		<div id="time"><span id="time"> </span></div>
+		<div id="l1">
+			<a>专利数量国家分布</a>
+			<canvas id="patentChart"></canvas> <!-- 柱状图的位置 -->
+		</div>
+		<div id="l2">
+			我是左2
+		</div>
+		<div id="c1">我是中1</div>
+		<div id="c2">我是中2</div>
+		<div id="r1">我是右1</div>
+		<div id="r2">我是右2</div>
+		<script>
+		
+			var countries = {{ result_left1 | map(attribute='country') | list | tojson }};
+        	var counts = {{ result_left1 | map(attribute='number') | list | tojson }};
+
+       		var ctx = document.getElementById('patentChart').getContext('2d');
+        
+			var patentChart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: countries,
+					datasets: [{
+						label: '专利数量',
+						data: counts,
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',  // 红色
+							'rgba(54, 162, 235, 0.2)',  // 蓝色
+							'rgba(255, 206, 86, 0.2)',  // 黄色
+							'rgba(75, 192, 192, 0.2)',  // 青色
+							'rgba(153, 102, 255, 0.2)', // 紫色
+							'rgba(255, 159, 64, 0.2)',  // 橙色
+							'rgba(199, 199, 199, 0.2)', // 灰色
+							'rgba(83, 102, 255, 0.2)'   // 深蓝色
+						],
+						borderColor: [
+							'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)',
+							'rgba(255, 159, 64, 1)',
+							'rgba(159, 159, 159, 1)',
+							'rgba(83, 102, 255, 1)'
+						],
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							beginAtZero: true
+						}
+					}
+				}
+			});
+		</script>
+		
+	</body>
+</html>
+
+

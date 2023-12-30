@@ -1,0 +1,40 @@
+{% extends "account_layout.html" %}
+{% block info %}
+    <h1>Manage Your Patent Application</h1><br>
+    {% if pending %}
+        {% for patent in pending %}
+            <a>Title: {{ patent.patent_title }}</a><br>
+            <a>Submission Time: {{ patent.patent_application_date}}</a><br>
+            <a>Status:</a>
+            <font color="blue">
+                <a> Pending</a><br>
+            </font>
+            <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
+            <a>-------------------------------------------------------</a><br>
+        {% endfor %}
+    {% endif %}
+    {% if rejected %}
+        {% for patent in rejected %}
+                <a>Title: {{ patent.patent_title }}</a><br>
+                <a>Submission Time: {{ patent.patent_application_date}}</a><br>
+                <a>Status:</a>
+                    <font color="red">
+                        <a> Rejected</a><br>
+                    </font>
+                    <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
+                <a>-------------------------------------------------------</a><br>
+        {% endfor %}
+    {% endif %}
+    {% if approved %}
+        {% for patent in approved %}
+            <a>Title: {{ patent.patent_title }}</a><br>
+            <a>Submission Time: {{ patent.patent_application_date}}</a><br>
+            <a>Status:</a>
+                    <font color="green">
+                        <a>Approved</a><br>
+                    </font>
+                    <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
+            <a>-------------------------------------------------------</a><br>
+        {% endfor %}
+    {% endif %}
+{% endblock info %}

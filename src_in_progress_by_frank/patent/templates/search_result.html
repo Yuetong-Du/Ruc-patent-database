@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <h1>Search Result</h1>
+</div>
+<div>
+    {% if result|length %}
+        <a>We have found {{result|length}} results for you. Hope it helps! </a>
+        {% for patent in result %}
+        <div class="content-section">
+            <a>Patent Title: {{ patent.patent_title }}</a><br>
+            <a>Patent id : {{ patent.patent_number }}</a><br>
+            <a>IPC section: {{ patent.ipc_section }}</a><br>
+            <a href={{ url_for("patent_detail",patent_id=patent.patent_number) }}>Details</a>
+        </div>
+    {% endfor %}
+    <a href={{ url_for("another_100_results",number = number)}}>Another 100 results</a>
+    {% else %}
+    <div class="content-section">
+        <a>We 're so sorry that there seems to be no matching result.</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock content %}
