@@ -281,7 +281,7 @@ def application_detail(application_table_id):
 
 @app.route("/search",methods=["GET","POST"])
 @login_required
-def applicant_search(): # customer_order_manage
+def applicant_search(number=100): # customer_order_manage
     
     form = GPatentSearch()
     if form.validate_on_submit():
@@ -328,9 +328,9 @@ def applicant_search(): # customer_order_manage
                 GInventorDetailed.inventor_name9.like(f'%{inventor}%')
             )
             conditions.append(or_(*inventor_conditions))
-        query = query.limit(100)
+        query = query.limit(number)
         
-        return render_template('search_result.html', title='Search Result', result = query)
+        return render_template('search_result.html', title='Search Result', result = query, number = number)
     return render_template('search_page.html', title='Search',form = form)
 
 
@@ -348,4 +348,8 @@ def cite(id):
 
     return redirect(url_for("home"))
 
-        
+@app.route("/search",methods=["GET","POST"])
+@login_required
+def another_100_results(number): # customer_order_manage
+    number += 100
+    return redirect(url_for( "applicant_search", number = number))

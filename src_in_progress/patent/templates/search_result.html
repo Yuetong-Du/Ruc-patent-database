@@ -14,10 +14,12 @@
             <a href={{ url_for("patent_detail",patent_id=patent.patent_number) }}>Details</a>
         </div>
     {% endfor %}
+    <a href={{ url_for("another_100_results",number = number) }}>Another 100 results</a>
     {% else %}
     <div class="content-section">
         <a>We 're so sorry that there seems to be no matching result.</a>
     </div>
     {% endif %}
+
 </div>
 {% endblock content %}
