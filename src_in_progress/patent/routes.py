@@ -28,11 +28,24 @@ def home():
 
 @app.route("/dashboard")
 def dashboard():
-    results = (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
+    result_left1= (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
                .group_by(GLocation.country)
                .order_by(func.count(GLocation.patent_number).desc())
                .limit(8).all())
-    return render_template("dashboard.html", result_left1=results, title="Dashboard")
+    result_left2 = (db.session.query(func.count(GPatent.ipc_section))
+                    .group_by(GPatent.ipc_section).all())
+    result_middle1 = (db.session.query(func.count(User.id),func.count(GPatent.patent_number)).all())
+    result_middle2 = (db.session.query(func.count(GApplication.application_year))
+                      .group_by(GApplication.application_year).all())
+    result_right1 = (db.session.query(func.count(Applicant.affliated_organization))
+                     .group_by(Applicant.affliated_organization)
+                     .having(func.count(Applicant.affliated_organization)>10).all())
+    result_right2 = (db.session.query(func.count(GPatent.num_claims))
+                     .group_by(GPatent.num_claims).all())
+    
+
+    return render_template("dashboard.html", result_left1=result_left1,result_left2 =result_left2,result_middle1=result_middle1,
+                           result_middle2=result_middle2,result_right1=result_right1,result_right2=result_right2, title="Dashboard")
 
 
 @app.route("/register", methods=["GET", 'POST'])  # register
