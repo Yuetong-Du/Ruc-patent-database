@@ -42,17 +42,9 @@ def dashboard():
 
     result_middle2 = (db.session.query(func.count(GApplication.application_year))
                       .group_by(GApplication.application_year).all())
-<<<<<<< Updated upstream
-    
-    result_right1 = (db.session.query(func.count(Applicant.affliated_organization))
-                     .group_by(Applicant.affliated_organization)
-                     .having(func.count(Applicant.affliated_organization)>1).all())
-    
-=======
     result_right1 = (db.session.query(InventorAlert.inventors,func.count(InventorAlert.inventors))
                      .group_by(InventorAlert.inventors)
                      .order_by(InventorAlert.inventors).all())
->>>>>>> Stashed changes
     result_right2 = (db.session.query(func.count(GPatent.num_claims))
                      .group_by(GPatent.num_claims).all())
     
