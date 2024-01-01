@@ -98,10 +98,11 @@
 		<div id="time"><span id="time"> </span></div>
 		<div id="l1">
 			<a>专利数量国家分布</a>
-			<canvas id="patentChart"></canvas> <!-- 柱状图的位置 -->
+			<canvas id="patentChart" width="400" height="200"></canvas>
 		</div>
 		<div id="l2">
-			我是左2
+			<a>专利数量类别分布</a>
+			<canvas id="ipcChart" width="400" height="200"></canvas>
 		</div>
 		<div id="c1">我是中1</div>
 		<div id="c2">我是中2</div>
@@ -110,8 +111,8 @@
 			<canvas id="team_member_num_Chart" width="400" height="200"></canvas>
 		</div>
 		<div id="r2">我是右2</div>
-		<script>
 		
+		<script>
 			var countries = {{ result_left1 | map(attribute='country') | list | tojson }};
         	var counts = {{ result_left1 | map(attribute='number') | list | tojson }};
        		var ctx = document.getElementById('patentChart').getContext('2d');
@@ -120,7 +121,53 @@
 				data: {
 					labels: countries,
 					datasets: [{
-						label: '专利数量',
+						label: 'patent数量',
+						data: counts,
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',  // 红色
+							'rgba(54, 162, 235, 0.2)',  // 蓝色
+							'rgba(255, 206, 86, 0.2)',  // 黄色
+							'rgba(75, 192, 192, 0.2)',  // 青色
+							'rgba(153, 102, 255, 0.2)', // 紫色
+							'rgba(255, 159, 64, 0.2)',  // 橙色
+							'rgba(199, 199, 199, 0.2)', // 灰色
+							'rgba(83, 102, 255, 0.2)'   // 深蓝色
+						],
+						borderColor: [
+							'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)',
+							'rgba(255, 159, 64, 1)',
+							'rgba(159, 159, 159, 1)',
+							'rgba(83, 102, 255, 1)'
+						],
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							display: true,
+							beginAtZero: true
+						}
+					}
+				}
+			});
+		</script>
+		
+		<script>
+			// 模拟专利申请团队人数分布的数据
+			var team_member_num = {{ result_right1 | map(attribute='country') | list | tojson }};
+        	var counts = {{ result_right1 | map(attribute='number') | list | tojson }};
+			var ctx = document.getElementById('team_member_num_Chart').getContext('2d');
+			var team_member_num_Chart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: team_member_num,
+					datasets: [{
+						label: '团队数量',
 						data: counts,
 						backgroundColor: [
 							'rgba(255, 99, 132, 0.2)',  // 红色
@@ -154,37 +201,52 @@
 				}
 			});
 		</script>
-		
+
 		<script>
-			// 模拟专利申请团队人数分布的数据
-			var teams = ["团队1", "团队2", "团队3", "团队4", "团队5"];
-			var teamCounts = [10, 20, 15, 30, 25];
-
-			// 获取绘图上下文
-			var ctx = document.getElementById('team_member_num_Chart').getContext('2d');
-
-			// 创建柱状图
-			var team_member_num_Chart = new Chart(ctx, {
+			var ipcs = {{ result_left2 | map(attribute='ipc_section') | list | tojson }};
+			var ipccounts = {{ result_left2 | map(attribute='number') | list | tojson }};
+			var ctx = document.getElementById('ipcChart').getContext('2d');
+			var ipcChart = new Chart(ctx, {
 				type: 'bar',
 				data: {
-					labels: teams,
+					labels: ipcs,
 					datasets: [{
-						label: '申请人数',
-						data: teamCounts,
-						backgroundColor: 'rgba(75, 192, 192, 0.2)', // 青色
-						borderColor: 'rgba(75, 192, 192, 1)',
+						label: 'section数量',
+						data: ipccounts,
+						backgroundColor: [
+							'rgba(255, 99, 132, 0.2)',  // 红色
+							'rgba(54, 162, 235, 0.2)',  // 蓝色
+							'rgba(255, 206, 86, 0.2)',  // 黄色
+							'rgba(75, 192, 192, 0.2)',  // 青色
+							'rgba(153, 102, 255, 0.2)', // 紫色
+							'rgba(255, 159, 64, 0.2)',  // 橙色
+							'rgba(199, 199, 199, 0.2)', // 灰色
+							'rgba(83, 102, 255, 0.2)'   // 深蓝色
+						],
+						borderColor: [
+							'rgba(255, 99, 132, 1)',
+							'rgba(54, 162, 235, 1)',
+							'rgba(255, 206, 86, 1)',
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)',
+							'rgba(255, 159, 64, 1)',
+							'rgba(159, 159, 159, 1)',
+							'rgba(83, 102, 255, 1)'
+						],
 						borderWidth: 1
 					}]
 				},
 				options: {
 					scales: {
 						y: {
+							display: true,
 							beginAtZero: true
 						}
 					}
 				}
 			});
 		</script>
+
 		
 	</body>
 </html>

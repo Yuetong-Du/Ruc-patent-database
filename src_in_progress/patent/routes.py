@@ -32,18 +32,24 @@ def dashboard():
                .group_by(GLocation.country)
                .order_by(func.count(GLocation.patent_number).desc())
                .limit(8).all())
-    result_left2 = (db.session.query(func.count(GPatent.ipc_section))
-                    .group_by(GPatent.ipc_section).all())
-    result_middle1 = (db.session.query(func.count(User.id),func.count(GPatent.patent_number)).all())
+    
+    result_left2 = (db.session.query(GPatent.ipc_section, func.count(GPatent.ipc_section).label('number'))
+                .group_by(GPatent.ipc_section)
+                .order_by(func.count(GPatent.ipc_section).desc())
+                .limit(8).all())
+    
+    result_middle1 = (db.session.query(func.count(Applicant.id).label('Aid'),func.count(User.id).label('Uid'),func.count(Visitor.id).label('Vid'),func.count(GPatent.patent_number).label('Patent_num')).all())
+
     result_middle2 = (db.session.query(func.count(GApplication.application_year))
                       .group_by(GApplication.application_year).all())
+    
     result_right1 = (db.session.query(func.count(Applicant.affliated_organization))
                      .group_by(Applicant.affliated_organization)
-                     .having(func.count(Applicant.affliated_organization)>10).all())
+                     .having(func.count(Applicant.affliated_organization)>1).all())
+    
     result_right2 = (db.session.query(func.count(GPatent.num_claims))
                      .group_by(GPatent.num_claims).all())
     
-
     return render_template("dashboard.html", result_left1=result_left1,result_left2 =result_left2,result_middle1=result_middle1,
                            result_middle2=result_middle2,result_right1=result_right1,result_right2=result_right2, title="Dashboard")
 
