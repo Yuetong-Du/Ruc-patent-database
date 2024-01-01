@@ -105,15 +105,16 @@
 		</div>
 		<div id="c1">我是中1</div>
 		<div id="c2">我是中2</div>
-		<div id="r1">我是右1</div>
+		<div id="r1">
+			<a>活跃团队人数分布</a>
+			<canvas id="team_member_num_Chart" width="400" height="200"></canvas>
+		</div>
 		<div id="r2">我是右2</div>
 		<script>
 		
 			var countries = {{ result_left1 | map(attribute='country') | list | tojson }};
         	var counts = {{ result_left1 | map(attribute='number') | list | tojson }};
-
        		var ctx = document.getElementById('patentChart').getContext('2d');
-        
 			var patentChart = new Chart(ctx, {
 				type: 'bar',
 				data: {
@@ -141,6 +142,37 @@
 							'rgba(159, 159, 159, 1)',
 							'rgba(83, 102, 255, 1)'
 						],
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							beginAtZero: true
+						}
+					}
+				}
+			});
+		</script>
+		
+		<script>
+			// 模拟专利申请团队人数分布的数据
+			var teams = ["团队1", "团队2", "团队3", "团队4", "团队5"];
+			var teamCounts = [10, 20, 15, 30, 25];
+
+			// 获取绘图上下文
+			var ctx = document.getElementById('team_member_num_Chart').getContext('2d');
+
+			// 创建柱状图
+			var team_member_num_Chart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: teams,
+					datasets: [{
+						label: '申请人数',
+						data: teamCounts,
+						backgroundColor: 'rgba(75, 192, 192, 0.2)', // 青色
+						borderColor: 'rgba(75, 192, 192, 1)',
 						borderWidth: 1
 					}]
 				},
