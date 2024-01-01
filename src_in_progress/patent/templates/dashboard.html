@@ -105,12 +105,18 @@
 			<canvas id="ipcChart" width="400" height="200"></canvas>
 		</div>
 		<div id="c1">我是中1</div>
-		<div id="c2">我是中2</div>
+		<div id="c2">
+			<a>专利申请年总量</a>
+			<canvas id="yearChart" width="400" height="200"></canvas>
+		</div>
 		<div id="r1">
 			<a>专利团队人数分布</a>
 			<canvas id="team_member_num_Chart" width="400" height="200"></canvas>
 		</div>
-		<div id="r2">我是右2</div>
+		<div id="r2">
+			<a>专利声明数量分布</a>
+			<canvas id="claimChart" width="400" height="200"></canvas>
+		</div>
 		
 		<script>
 			var countries = {{ result_left1 | map(attribute='country') | list | tojson }};
@@ -246,8 +252,65 @@
 			});
 		</script>
 
-		
+		<script>
+			var years = {{ result_middle2 | map(attribute='application_year') | list | tojson }};
+			var counts = {{ result_middle2 | map(attribute='number') | list | tojson }};
+			var ctx = document.getElementById('yearChart').getContext('2d');
+			var patentChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: years,
+					datasets: [{
+						label: 'application数量',
+						data: counts,
+						borderColor: 'rgba(75, 192, 192, 1)',
+						borderWidth: 1,
+						fill:false
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							display: true,
+							beginAtZero: true
+						}
+					}
+				}
+			});
+		</script>
 
+		<script>
+			var claims = {{ result_right2 | map(attribute='num_claims') | list | tojson }};
+			var counts = {{ result_right2 | map(attribute='number') | list | tojson }};
+			var ctx = document.getElementById('claimChart').getContext('2d');
+			var claimChart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: claims,
+					datasets: [{
+						label: 'claim数量',
+						data: counts,
+						backgroundColor:'rgba(255, 99, 132, 0.2)',  // 红色
+						borderColor:'rgba(255, 99, 132, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						y: {
+							display: true,
+							beginAtZero: true
+						}
+						x: {
+							ticks: {
+								maxRotation:0,
+								maxTicksLimit:10
+							}
+						}
+					}
+				}
+			});
+		</script>
 
 	</body>
 </html>

@@ -49,7 +49,7 @@ def dashboard():
                      .group_by(InventorAlert.inventors)
                      .order_by(InventorAlert.inventors).all())
     
-    result_right2 = (db.session.query(func.count(GPatent.num_claims))
+    result_right2 = (db.session.query(GPatent.num_claims,func.count(GPatent.num_claims).label('number'))
                      .group_by(GPatent.num_claims).all())
     
     return render_template("dashboard.html", result_left1=result_left1,result_left2 =result_left2,result_middle1=result_middle1,
