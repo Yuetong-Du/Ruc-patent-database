@@ -41,7 +41,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.ipc_section(class="form-control form-control-lg") }}
+                        {{ form.patent_type(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -94,6 +94,19 @@
                         </div>
                     {% else %}
                         {{ form.inventor(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.per_page.label(class="form-control-label") }}
+                    {% if form.per_page.errors %}
+                        {{ form.per_page(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.per_page.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.per_page(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
             </fieldset>

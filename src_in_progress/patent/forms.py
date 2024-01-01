@@ -1,13 +1,13 @@
-from flask import flash
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField, FloatField, IntegerField
-from wtforms.validators import DataRequired, EqualTo, ValidationError, Length, Email, InputRequired
-from patent.models import Applicant, Visitor, Inspector
 from flask_login import current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, \
+    SelectField, TextAreaField, FloatField, IntegerField
+from wtforms.validators import DataRequired, EqualTo, ValidationError, Email, InputRequired, Length
+from patent.models import Applicant, Visitor, Inspector
 
 
 class RegistrationForm(FlaskForm):
-    role=SelectField("Select role", coerce=str, choices=[("1","Applicant"), ("2","Visitor"),("3","Inspector")])
+    role = SelectField("Select role", coerce=str, choices=[("1", "Applicant"), ("2", "Visitor"), ("3", "Inspector")])
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Mail', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=20)])
@@ -19,23 +19,23 @@ class RegistrationForm(FlaskForm):
             table = Applicant
         elif self.role.data == "2":
             table = Visitor
-        elif self.role.data =="3":
+        elif self.role.data == "3":
             table = Inspector
         if table.query.filter_by(email=email.data).first():
             raise ValidationError("Duplicate email")
 
 
 class LoginForm(FlaskForm):
-    role = SelectField("Select role",coerce=str,choices=[("1","Applicant"),("2","Visitor"),("3","Inspector")])
-    email = StringField('Mail',validators=[DataRequired(), Email()])
-    password = PasswordField('Password',validators=[DataRequired()])
+    role = SelectField("Select role", coerce=str, choices=[("1", "Applicant"), ("2", "Visitor"), ("3", "Inspector")])
+    email = StringField('Mail', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField("Remember me")
     submit = SubmitField('Sign in')
 
 
 class UpdateInfo(FlaskForm):
-    username = StringField('Username',validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Mail',validators=[DataRequired(), Email()])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Mail', validators=[DataRequired(), Email()])
     submit = SubmitField('Update')
 
     def validate_email(self, email):
@@ -44,20 +44,20 @@ class UpdateInfo(FlaskForm):
         elif current_user.table_name == "Visitor":
             table = Visitor
         user = table.query.filter_by(email=email.data).first()
-        if user and user.username !=current_user.username:
+        if user and user.username != current_user.username:
             raise ValidationError("Duplicate email")
 
 
 class UpdatePasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired(),Length(min=6, max=20)])
-    confirm_password = PasswordField('Confirm Password',validators=[DataRequired(), EqualTo('password')])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=20)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Update')
 
 
 class UpdateApplicantForm(FlaskForm):
-    affliated_organization = StringField("affliated_organization",validators=[InputRequired(),Length(min=2,max=20)])
-    address = StringField("Address",validators=[InputRequired(),Length(min=10,max=40)])
-    telephone = StringField("Telephone",validators=[InputRequired(),Length(max=20,min=9)])
+    affliated_organization = StringField("affliated_organization", validators=[InputRequired(), Length(min=2, max=20)])
+    address = StringField("Address", validators=[InputRequired(), Length(min=10, max=40)])
+    telephone = StringField("Telephone", validators=[InputRequired(), Length(max=20, min=9)])
     submit = SubmitField("Update")
 
 
@@ -66,36 +66,34 @@ class UpdateVisitorForm(FlaskForm):
     telephone = StringField("Telephone", validators=[InputRequired(), Length(max=20, min=9)])
     submit = SubmitField('Update')
 
+
 class UpdateInspectorForm(FlaskForm):
     # address = StringField('address',validators=[InputRequired(),Length(min=5, max=40)])
     telephone = StringField("Telephone", validators=[InputRequired(), Length(max=20, min=9)])
     submit = SubmitField('Update')
 
+
 class ProductForm(FlaskForm):
-    name = StringField('Product name',validators=[DataRequired(), Length(min=2, max=40)])
-    price =FloatField("Product price", validators=[DataRequired()])
+    name = StringField('Product name', validators=[DataRequired(), Length(min=2, max=40)])
+    price = FloatField("Product price", validators=[DataRequired()])
     count = IntegerField("Product count", validators=[DataRequired()])
-    confirm = IntegerField("Confirm Product count",validators=[DataRequired(), EqualTo("count")])
+    confirm = IntegerField("Confirm Product count", validators=[DataRequired(), EqualTo("count")])
     submit = SubmitField("Add")
 
 
 class UpdateProductForm(FlaskForm):
-    name = StringField('Product name',validators=[InputRequired(), Length(min=2, max=40)])
+    name = StringField('Product name', validators=[InputRequired(), Length(min=2, max=40)])
     price = FloatField("Product price", validators=[InputRequired()])
     count = IntegerField("Product count", validators=[InputRequired()])
     confirm = IntegerField("Confirm Product count", validators=[InputRequired(), EqualTo("count")])
     submit = SubmitField("Update")
 
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, DateTimeField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Length, Optional
-
 class GApplicationInProgress(FlaskForm):
 
     d_ipc = SelectField(
         'D-IPC',
-        choices = [(0,0),(1,1)],
+        choices=[(0, 0), (1, 1)],
         validators=[DataRequired()]
     )
     ipc_section = StringField(
@@ -123,15 +121,17 @@ class GApplicationInProgress(FlaskForm):
     def add_inventor_fields(self, number_of_inventors):
         for i in range(1, number_of_inventors + 1):
             setattr(self, f'inventor_name{i}', StringField(f'Inventor Name {i}'))
-            setattr(self, f'male_flag{i}', SelectField(f'Inventor Gender {i}', choices=[('1', 'Male'), ('0', 'Female')]))
+            setattr(self, f'male_flag{i}',
+                    SelectField(f'Inventor Gender {i}', choices=[('1', 'Male'), ('0', 'Female')]))
 
     submit = SubmitField("Submit")
+
 
 class GPatentSearch(FlaskForm):
 
     d_ipc = SelectField(
         'D-IPC',
-        choices = [('NA','Both'),(0,0),(1,1)],
+        choices=[('NA', 'Both'), (0, 0), (1, 1)],
         validators=[]
     )
     ipc_section = StringField(
@@ -140,7 +140,8 @@ class GPatentSearch(FlaskForm):
     )
     patent_type = SelectField(
         'Patent Type', 
-        choices=[('NA','Any will be fine!'),('utility', 'utility'), ('design', 'design'), ('plant', 'plant'), ('reissue', 'reissue')],
+        choices=[('NA', 'Any will be fine!'), ('utility', 'utility'), ('design', 'design'),
+                 ('plant', 'plant'), ('reissue', 'reissue')],
         validators=[]
     )
     patent_keyword = TextAreaField(
@@ -159,6 +160,10 @@ class GPatentSearch(FlaskForm):
         'Inventor Name', 
         validators=[Length(max=32)]
     )
-    
+    per_page = SelectField(
+        'per_page (Default 10)',
+        choices=[(10, 10), (20, 20), (30, 30), (50, 50), (100, 100)],
+        validators=[]
+    )
 
     submit = SubmitField("Search")

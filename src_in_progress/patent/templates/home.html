@@ -15,7 +15,6 @@
     </body>
 </div>
 
-
 <div>
     {% if patents %}
     {% for patent in patents %}
@@ -27,6 +26,8 @@
         <a href="{{ url_for('cite', id=patent.patent_number) }}">Claim</a>
     </div>
     {% endfor %}
+        {{ pagination.info }}
+        {{ pagination.links }}
     {% else %}
     <div class="content-section">
         <h2>Waiting to get patent applied, so excited!</h2>

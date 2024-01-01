@@ -1,20 +1,38 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="content-section">
-    <h1>Search Result</h1>
+    <h1>Search Result of <span style='color:green;'>{{ keyword }}</span></h1>
 </div>
 <div>
-    {% if result|length %}
-        <a>We have found {{result|length}} results for you. Hope it helps! </a>
+    {% if number %}
+        <a>We have found {{number}} result(s) for you. Hope it helps! </a><br>
+        <a> {{ result|length }} of them: </a>
         {% for patent in result %}
         <div class="content-section">
-            <a>Patent Title: {{ patent.patent_title }}</a><br>
-            <a>Patent id : {{ patent.patent_number }}</a><br>
-            <a>IPC section: {{ patent.ipc_section }}</a><br>
+            <script type="text/javascript">
+                function replaceHandle(parentStr, searchText) {
+                    let res = new RegExp("("+searchText+")",'g')
+                    parentStr = parentStr.replace(res,"<span style='color:black;'>" + searchText+"</span>")
+                    return parentStr
+                }
+            </script>
+            <a>
+                <script>document.write(replaceHandle("Patent Title:","Patent Title:"))</script>
+                    <span style='color:blue'>{{ patent.patent_title }}</span>
+            </a><br>
+            <a>
+                <script>document.write(replaceHandle("Patent id:","Patent id:"))</script>
+                    <span style='color:blue'>{{ patent.patent_number }}</span>
+            </a><br>
+            <a>
+                <script>document.write(replaceHandle("IPC section:","IPC section:"))</script>
+                    <span style='color:blue'>{{ patent.ipc_section }}</span>
+            </a><br>
             <a href={{ url_for("patent_detail",patent_id=patent.patent_number) }}>Details</a>
         </div>
-    {% endfor %}
-    <a href={{ url_for("another_100_results",number = number)}}>Another 100 results</a>
+        {% endfor %}
+        {{ pagination.info }}
+        {{ pagination.links }}
     {% else %}
     <div class="content-section">
         <a>We 're so sorry that there seems to be no matching result.</a>

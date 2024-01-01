@@ -7,23 +7,35 @@ from datetime import datetime
 from sqlalchemy import or_, and_
 from flask import session
 from sqlalchemy import func
+from flask_paginate import get_page_parameter, Pagination
+
 
 @app.route('/')
-@app.route("/home") # home page
+@app.route("/home")  # home page
 def home():
-    first_ten_patents = GPatent.query.limit(10).all()
-    return render_template("home.html", patents=first_ten_patents, title = "Home")
+    patents = GPatent.query.all()
+
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    per_page = 20
+    pagination = Pagination(page=page, per_page=per_page, total=len(patents), css_framework='bootstrap4')
+
+    start = (page - 1) * per_page
+    end = start + per_page
+    patents = patents[start:end]
+
+    return render_template("home.html", patents=patents, pagination=pagination, title="Home")
+
 
 @app.route("/dashboard")
-def  dashboard():
+def dashboard():
     results = (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
                .group_by(GLocation.country)
                .order_by(func.count(GLocation.patent_number).desc())
-               .limit(8)
-               .all())
-    return render_template("dashboard.html",result_left1= results,title="Dashboard")
+               .limit(8).all())
+    return render_template("dashboard.html", result_left1=results, title="Dashboard")
 
-@app.route("/register",methods=["GET", 'POST']) # register
+
+@app.route("/register", methods=["GET", 'POST'])  # register
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -48,8 +60,8 @@ def register():
         user = User()
         user.table_name = table_name
         user.table_id = table.query.filter_by(email=form.email.data).first().id
-        user.username=form.username.data
-        user.email=form.email.data
+        user.username = form.username.data
+        user.email = form.email.data
         db.session.add(user)
         db.session.commit()
         flash('Your account was created successfully', 'success')
@@ -57,7 +69,7 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route("/login",methods=["GET",'POST']) # login
+@app.route("/login", methods=["GET", 'POST'])  # login
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -65,7 +77,7 @@ def login():
     if form.validate_on_submit():
         if form.role.data == "1":
             table = Applicant
-            table_name="Applicant"
+            table_name = "Applicant"
         elif form.role.data == "2":
             table = Visitor
             table_name = "Visitor"
@@ -75,60 +87,70 @@ def login():
         user = table.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             table_id = user.id
-            user_user = User.query.filter_by(table_id=table_id,table_name=table_name).first()
-            login_user(user_user,remember=form.remember.data)
+            user_user = User.query.filter_by(table_id=table_id, table_name=table_name).first()
+            login_user(user_user, remember=form.remember.data)
             return redirect(url_for('home'))
         else:
             flash('Login failed, please check your character name, email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 
-@app.route("/logout") # logout
+@app.route("/logout")  # logout
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route("/<string:patent_id>/detail") # 展示专利详细信息
-def patent_detail(patent_id):
-    patent_info = GPatent.query.filter_by(patent_number = patent_id).first()
-    patent_detail = GInventorGeneral.query.filter_by(patent_number = patent_id).first()
-    patent_super_detail = GInventorDetailed.query.filter_by(patent_number = patent_id).first()
-    return render_template('patent_detail.html', title='Patent_detail', patent_info = patent_info, patent_detail = patent_detail, super_detail = patent_super_detail)
 
-@app.route("/applicant/<string:username>/account") # asking applicants to fill in detailed info
+@app.route("/<string:patent_id>/detail")  # 展示专利详细信息
+def patent_detail(patent_id):
+    patent_info = GPatent.query.filter_by(patent_number=patent_id).first()
+    patent_detail = GInventorGeneral.query.filter_by(patent_number=patent_id).first()
+    patent_super_detail = GInventorDetailed.query.filter_by(patent_number=patent_id).first()
+    return render_template('patent_detail.html', title='Patent_detail', patent_info=patent_info,
+                           patent_detail=patent_detail, super_detail=patent_super_detail)
+
+
+@app.route("/applicant/<string:username>/account")  # asking applicants to fill in detailed info
 @login_required
 def applicant_account(username):
     if current_user.table_name != "Applicant":
         abort(403)
     Applicant1 = Applicant.query.filter_by(id=current_user.table_id).first()
     if Applicant1.affliated_organization == "null" or Applicant1.address == "null" or Applicant1.telephone == "null":
-        flash("Please complete your personal information as soon as possible","warning")
+        flash("Please complete your personal information as soon as possible", "warning")
         return redirect(url_for("applicant_detail_manage"))
     return render_template("applicant_account.html", username=username)
 
-@app.route("/visitor/<string:username>/account") # asking visitors to update their detailed info
+
+@app.route("/visitor/<string:username>/account")  # asking visitors to update their detailed info
 @login_required
 def visitor_account(username):
     if current_user.table_name != "Visitor":
         abort(403)
-    visitor1 = Visitor.query.filter_by(id=current_user.table_id).first() # looking for visitor info and set it into an object
-    if visitor1.telephone == "null": # if any of the info is not submitted
-        flash("Please complete your personal information as soon as possible","warning")
+    visitor1 = Visitor.query.filter_by(id=current_user.table_id).first()
+    # looking for visitor info and set it into an object
+
+    if visitor1.telephone == "null":  # if any of the info is not submitted
+        flash("Please complete your personal information as soon as possible", "warning")
         return redirect(url_for("visitor_detail_manage"))
     return render_template("visitor_account.html", username=username)
 
-@app.route("/inspector/<string:username>/account") # asking visitors to update their detailed info
+
+@app.route("/inspector/<string:username>/account")  # asking visitors to update their detailed info
 @login_required
 def inspector_account(username):
     if current_user.table_name != "Inspector":
         abort(403)
-    insepctor1 = Inspector.query.filter_by(id=current_user.table_id).first() # looking for visitor info and set it into an object
-    if insepctor1.telephone == "null": # if any of the info is not submitted
-        flash("Please complete your personal information as soon as possible","warning")
+    insepctor1 = Inspector.query.filter_by(id=current_user.table_id).first()
+    # looking for visitor info and set it into an object
+
+    if insepctor1.telephone == "null":  # if any of the info is not submitted
+        flash("Please complete your personal information as soon as possible", "warning")
         return redirect(url_for("inspector_detail_manage"))
     return render_template("inspector_account.html", username=username)
 
-@app.route("/update/info",methods=["GET","POST"])
+
+@app.route("/update/info", methods=["GET", "POST"])
 @login_required
 def update_info():
     if current_user.table_name == "Applicant":
@@ -156,7 +178,8 @@ def update_info():
         form.email.data = role.email
     return render_template("update_info.html", form=form)
 
-@app.route("/update/password",methods=["GET","POST"])
+
+@app.route("/update/password", methods=["GET", "POST"])
 @login_required
 def update_password():
     if current_user.table_name == "Applicant":
@@ -178,7 +201,7 @@ def update_password():
     return render_template("update_password.html", form=form)
     
 
-@app.route("/applicant/detail", methods=["POST","GET"])
+@app.route("/applicant/detail", methods=["POST", "GET"])
 @login_required
 def applicant_detail_manage():
     if current_user.table_name != "Applicant":
@@ -190,46 +213,49 @@ def applicant_detail_manage():
         address.address = form.address.data
         address.telephone = form.telephone.data
         db.session.commit()
-        flash("Shipping address updated successfully!","success")
-    elif request.method =="GET":
+        flash("Shipping address updated successfully!", "success")
+    elif request.method == "GET":
         form.affliated_organization.data = address.affliated_organization
         form.address.data = address.address
         form.telephone.data = address.telephone
-    return render_template("update_applicant.html",form=form)
+    return render_template("update_applicant.html", form=form)
 
-@app.route("/visitor/detail",methods=["GET","POST"])
+
+@app.route("/visitor/detail", methods=["GET", "POST"])
 @login_required
-def visitor_detail_manage(): # supplier_shipper_manage
+def visitor_detail_manage():  # supplier_shipper_manage
     if current_user.table_name != "Visitor":
         abort(403)
     form = UpdateVisitorForm()
-    visitor1 = Visitor.query.filter_by(id=current_user.table_id).first() # look for visitor info
+    visitor1 = Visitor.query.filter_by(id=current_user.table_id).first()  # look for visitor info
     if form.validate_on_submit():
         visitor1.telephone = form.telephone.data
         db.session.add(visitor1)
         db.session.commit()
-        flash("Profile updated successfully","success")
+        flash("Profile updated successfully", "success")
     elif request.method == "GET":
         form.telephone.data = visitor1.telephone
     return render_template("update_visitor.html", form=form)
 
-@app.route("/inspector/detail",methods=["GET","POST"])
+
+@app.route("/inspector/detail", methods=["GET", "POST"])
 @login_required
 def inspector_detail_manage():
     if current_user.table_name != "Inspector":
         abort(403)
     form = UpdateInspectorForm()
-    inspector1 = Inspector.query.filter_by(id=current_user.table_id).first() # look for visitor info
+    inspector1 = Inspector.query.filter_by(id=current_user.table_id).first()  # look for visitor info
     if form.validate_on_submit():
         inspector1.telephone = form.telephone.data
         db.session.add(inspector1)
         db.session.commit()
-        flash("Profile updated successfully","success")
+        flash("Profile updated successfully", "success")
     elif request.method == "GET":
         form.telephone.data = inspector1.telephone
     return render_template("update_inspector.html", form=form)
 
-@app.route("/applicant/apply",methods=["GET","POST"])
+
+@app.route("/applicant/apply", methods=["GET", "POST"])
 @login_required
 def applicant_apply():
     if current_user.table_name != "Applicant":
@@ -268,18 +294,18 @@ def applicant_apply():
         return redirect(url_for('home'))
     return render_template("applicant_apply.html", form=form)
 
+
 @app.route("/applicant/application_manage")
 @login_required
-def applicant_application_manage(): # customer_order_manage
+def applicant_application_manage():  # customer_order_manage
     if current_user.table_name != "Applicant":
         abort(403)
-    pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id,status=1).all()
+    pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=1).all()
     rejected_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=2).all()
     approved_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=3).all()
-    return render_template("applicant_patent_in_progress_manage.html",
-                            pending=pending_patents,
-                            rejected = rejected_patents,
-                            approved = approved_patents)
+    return render_template("applicant_patent_in_progress_manage.html", pending=pending_patents,
+                           rejected=rejected_patents, approved=approved_patents)
+
 
 @app.route("/applicant/application_detail/<int:application_table_id>")
 @login_required
@@ -303,19 +329,19 @@ def patent_search():
             'patent_type': form.patent_type.data,
             'd_ipc': form.d_ipc.data,
             'wipo_kind': form.wipo_kind.data,
-            'inventor': form.inventor.data
+            'inventor': form.inventor.data,
+            'per_page': form.per_page.data
         }
 
         # 重定向到结果显示视图
-        return redirect(url_for('another_100_results', number=100))  # 初始化结果数量为 100
+        return redirect(url_for('search_results'))
 
     return render_template('search_page.html', title='Search', form=form)
 
 
-@app.route("/search/plus_100/<int:number>", methods=["GET", "POST"])
+@app.route("/search_result", methods=["GET", "POST"])
 @login_required
-def another_100_results(number):
-    number += 100
+def search_results():
     search_params = session.get('search_params', {})
     query = GPatent.query
     conditions = []
@@ -326,7 +352,7 @@ def another_100_results(number):
     if search_params.get('patent_abstract_keyword'):
         conditions.append(GPatent.patent_abstract.like(f'%{search_params["patent_abstract_keyword"]}%'))
     if search_params.get('ipc_section'):
-        conditions.append(GPatent.ipc_section == search_params['ipc_section'])
+        conditions.append(GPatent.ipc_section.like(f'%{search_params["ipc_section"]}%'))
     if search_params.get('patent_type') and search_params['patent_type'] != "NA":
         conditions.append(GPatent.patent_type == search_params['patent_type'])
     if search_params.get('d_ipc') and search_params['d_ipc'] != "NA":
@@ -337,6 +363,7 @@ def another_100_results(number):
     # 应用普通搜索条件
     if conditions:
         query = query.filter(and_(*conditions))
+        # query.patent_title = query.patent_title.replace(keyword, Fore.RED + keyword)
 
     # 构建发明家搜索条件并应用
     inventor_conditions = []
@@ -356,15 +383,23 @@ def another_100_results(number):
             query = query.join(GInventorDetailed, GPatent.patent_number == GInventorDetailed.patent_number)
             query = query.filter(or_(*inventor_conditions))
 
-    # 执行查询并限制结果数量
-    query = query.limit(number)
     results = query.all()
+    num = len(results)
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    per_page = search_params.get('per_page')
+    per_page = int(per_page)
+    pagination = Pagination(page=page, per_page=per_page, total=len(results), css_framework='bootstrap4')
 
-    return render_template('search_result.html', title='Search Result', result=results, number=number)
+    start = (page - 1) * per_page
+    end = start + per_page
+    results = results[start:end]
+    return render_template('search_result.html', title='Search Result', number=num, pagination=pagination,
+                           result=results, keyword=search_params["patent_keyword"])
+
 
 @app.route("/cite/<id>")
 @login_required
-def cite(id):
+def cite():
     patent = GPatent.query.filter_by(patent_number=id).first()
     if patent:
         patent.num_claims = patent.num_claims + 1 if patent.num_claims else 1
@@ -376,9 +411,9 @@ def cite(id):
 
     return redirect(url_for("home"))
 
+
 @app.route("/cite/<id>")
 @login_required
-def inspector_process_applications(id):
-    
+def inspector_process_applications():
 
     return redirect(url_for("home"))
