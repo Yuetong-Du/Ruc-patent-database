@@ -28,11 +28,14 @@ def home():
 
 @app.route("/dashboard")
 def dashboard():
-    results = (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
+    results_left1 = (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
                .group_by(GLocation.country)
                .order_by(func.count(GLocation.patent_number).desc())
                .limit(8).all())
-    return render_template("dashboard.html", result_left1=results, title="Dashboard")
+    
+    #results_left2
+
+    return render_template("dashboard.html", result_left1=results_left1, title="Dashboard")
 
 
 @app.route("/register", methods=["GET", 'POST'])  # register
