@@ -145,8 +145,8 @@ class GPatentSearch(FlaskForm):
         validators=[]
     )
     patent_keyword = TextAreaField(
-        'Patent Keyword (Required)', 
-        validators=[DataRequired()]
+        'Patent Keyword', 
+        validators=[]
     )
     patent_abstract_keyword = TextAreaField(
         'Patent Abstract', 
@@ -160,6 +160,29 @@ class GPatentSearch(FlaskForm):
         'Inventor Name', 
         validators=[Length(max=32)]
     )
+
+    assignee = StringField(
+        'Assignee',
+        validators=[Length(max=50)]
+    )
+
+    country = StringField(
+        'Country',
+        validators=[Length(max=50)]
+    )
+    city = StringField(
+        'City',
+        validators=[Length(max=50)]
+    )
+    state = StringField(
+        'state',
+        validators=[Length(max=50)]
+    )
+    county = StringField(
+        'state',
+        validators=[Length(max=50)]
+    )
+
     per_page = SelectField(
         'per_page (Default 10)',
         choices=[(10, 10), (20, 20), (30, 30), (50, 50), (100, 100)],

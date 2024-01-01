@@ -109,8 +109,15 @@ def patent_detail(patent_id):
     patent_info = GPatent.query.filter_by(patent_number=patent_id).first()
     patent_detail = GInventorGeneral.query.filter_by(patent_number=patent_id).first()
     patent_super_detail = GInventorDetailed.query.filter_by(patent_number=patent_id).first()
-    return render_template('patent_detail.html', title='Patent_detail', patent_info=patent_info,
-                           patent_detail=patent_detail, super_detail=patent_super_detail)
+    assignee = GAssignee.query.filter_by(patent_number = patent_id).first()
+    location = GLocation.query.filter_by(patent_number = patent_id).first()
+    return render_template('patent_detail.html',
+                            title='Patent_detail',
+                            patent_info=patent_info,
+                            assignee = assignee,
+                            location = location,   
+                            patent_detail=patent_detail, 
+                            super_detail=patent_super_detail)
 
 
 @app.route("/applicant/<string:username>/account")  # asking applicants to fill in detailed info
@@ -402,7 +409,7 @@ def search_results():
 
 @app.route("/cite/<id>")
 @login_required
-def cite():
+def cite(id):
     patent = GPatent.query.filter_by(patent_number=id).first()
     if patent:
         patent.num_claims = patent.num_claims + 1 if patent.num_claims else 1
