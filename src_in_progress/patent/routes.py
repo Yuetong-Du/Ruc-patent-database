@@ -40,12 +40,14 @@ def dashboard():
     
     result_middle1 = (db.session.query(func.count(Applicant.id).label('Aid'),func.count(User.id).label('Uid'),func.count(Visitor.id).label('Vid'),func.count(GPatent.patent_number).label('Patent_num')).all())
 
-    result_middle2 = (db.session.query(func.count(GApplication.application_year))
-                      .group_by(GApplication.application_year).all())
+    result_middle2 = (db.session.query(GApplication.application_year,func.count(GApplication.application_year).label('number'))
+                .group_by(GApplication.application_year)
+                .order_by(GApplication.application_year.asc())
+                .all())
     
-    result_right1 = (db.session.query(func.count(Applicant.affliated_organization))
-                     .group_by(Applicant.affliated_organization)
-                     .having(func.count(Applicant.affliated_organization)>1).all())
+    result_right1 = (db.session.query(InventorAlert.inventors,func.count(InventorAlert.inventors).label('number'))
+                     .group_by(InventorAlert.inventors)
+                     .order_by(InventorAlert.inventors).all())
     
     result_right2 = (db.session.query(func.count(GPatent.num_claims))
                      .group_by(GPatent.num_claims).all())
