@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+        <h2>Hello, <span style='color:green'>{{ statement }}</span>!</h2>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        System Time：
+        <title>当前时间</title>
+    </head>
+    <body>
+        <div id="datetime">
+            <script>
+                setInterval("document.getElementById('datetime').innerHTML=new Date().toLocaleString();", 1000);
+            </script>
+        </div>
+    </body>
+</div>
+
+<div class="content-section">
+    <a> As far, there have been </a>
+        <a> <span style='color:red'>{{ user_num }}</span> users, </a>
+        <a> <span style='color:red'>{{ patent_num }}</span> patents. </a><br>
+    <a>You can search for patents you want. </a><br>
+    <a> The dashboard give an overview of patents. </a><br>
+    <br>
+    <a> If you have questions or suggestions, feel free to contact us. </a>
+</div>
+
+{% endblock content %}
