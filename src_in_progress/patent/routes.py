@@ -13,32 +13,41 @@ from flask_paginate import get_page_parameter, Pagination
 @app.route('/')
 @app.route("/home")  # home page
 def home():
-    patents = GPatent.query.all()
-
-    page = request.args.get(get_page_parameter(), type=int, default=1)
-    per_page = 20
-    pagination = Pagination(page=page, per_page=per_page, total=len(patents), css_framework='bootstrap4')
-
-    start = (page - 1) * per_page
-    end = start + per_page
-    patents = patents[start:end]
-
-    return render_template("home.html", patents=patents, pagination=pagination, title="Home")
+    if current_user.is_authenticated:
+        statement = current_user.username
+    else:
+        statement = "please sign in first"
+    return render_template("home.html", statement=statement, user_num=len(User.query.all()),
+                           patent_num=178233, title="Home")
 
 
 @app.route("/dashboard")
 def dashboard():
-    result_left1= (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
-               .group_by(GLocation.country)
-               .order_by(func.count(GLocation.patent_number).desc())
-               .limit(8).all())
+    result_left1 = (db.session.query(GLocation.country, func.count(GLocation.patent_number).label('number'))
+                .filter(GLocation.country != '')  # 过滤掉国家名称为空的记录
+                .group_by(GLocation.country)
+                .order_by(func.count(GLocation.patent_number).desc())
+                .limit(8)
+                .all())
+
     
     result_left2 = (db.session.query(GPatent.ipc_section, func.count(GPatent.ipc_section).label('number'))
-                .group_by(GPatent.ipc_section)
-                .order_by(func.count(GPatent.ipc_section).desc())
-                .limit(8).all())
+                    .filter(GPatent.ipc_section != '')
+                    .group_by(GPatent.ipc_section)
+                    .order_by(func.count(GPatent.ipc_section).desc())
+                    .limit(8).all())
     
-    result_middle1 = (db.session.query(func.count(Applicant.id).label('Aid'),func.count(User.id).label('Uid'),func.count(Visitor.id).label('Vid'),func.count(GPatent.patent_number).label('Patent_num')).all())
+    result_middle1 = (db.session.query(func.count(GPatent.patent_number).label('Patent_num')))
+
+    result_middle1a =(db.session.query(func.count(Applicant.id).label('Aid')))
+
+    result_middle1b =(db.session.query(func.count(User.id).label('Uid')))
+
+    result_middle1c =(db.session.query(func.count(Visitor.id).label('Vid')))
+
+    result_middle1d =(db.session.query(func.count(Inspector.id).label('Iid')))
+
+    result_middle1e =(db.session.query(func.count(GApplicationInProgress.table_number).label('Appid')))
 
     result_middle2 = (db.session.query(GApplication.application_year,func.count(GApplication.application_year).label('number'))
                 .group_by(GApplication.application_year)
@@ -50,10 +59,25 @@ def dashboard():
                      .order_by(InventorAlert.inventors).all())
     
     result_right2 = (db.session.query(GPatent.num_claims,func.count(GPatent.num_claims).label('number'))
-                     .group_by(GPatent.num_claims).all())
+                     .group_by(GPatent.num_claims)
+                     .order_by(GPatent.num_claims.asc())
+                     .all())
     
-    return render_template("dashboard.html", result_left1=result_left1,result_left2 =result_left2,result_middle1=result_middle1,
-                           result_middle2=result_middle2,result_right1=result_right1,result_right2=result_right2, title="Dashboard")
+    return render_template("dashboard.html", 
+                           result_left1=result_left1,
+                           result_left2 =result_left2,
+                           result_middle1=result_middle1,
+                           result_middle1a=result_middle1a,
+                           result_middle1b=result_middle1b,
+                           result_middle1c=result_middle1c,
+                           result_middle2=result_middle2,
+                           result_right1=result_right1,
+                           result_right2=result_right2, 
+                           result_middle1d = result_middle1d,
+                           result_middle1e= result_middle1e,
+                           title="Dashboard")
+
+
 
 
 @app.route("/register", methods=["GET", 'POST'])  # register
@@ -127,15 +151,8 @@ def patent_detail(patent_id):
     patent_info = GPatent.query.filter_by(patent_number=patent_id).first()
     patent_detail = GInventorGeneral.query.filter_by(patent_number=patent_id).first()
     patent_super_detail = GInventorDetailed.query.filter_by(patent_number=patent_id).first()
-    assignee = GAssignee.query.filter_by(patent_number = patent_id).first()
-    location = GLocation.query.filter_by(patent_number = patent_id).first()
-    return render_template('patent_detail.html',
-                            title='Patent_detail',
-                            patent_info=patent_info,
-                            assignee = assignee,
-                            location = location,   
-                            patent_detail=patent_detail, 
-                            super_detail=patent_super_detail)
+    return render_template('patent_detail.html', title='Patent_detail', patent_info=patent_info,
+                           patent_detail=patent_detail, super_detail=patent_super_detail)
 
 
 @app.route("/applicant/<string:username>/account")  # asking applicants to fill in detailed info
@@ -227,7 +244,7 @@ def update_password():
         flash('Your password has been updated', 'success')
         return redirect(url_for("home"))
     return render_template("update_password.html", form=form)
-    
+
 
 @app.route("/applicant/detail", methods=["POST", "GET"])
 @login_required
@@ -289,10 +306,10 @@ def applicant_apply():
     if current_user.table_name != "Applicant":
         abort(403)
     inventor_count = sum(1 for key in request.form.keys() if key.startswith('inventor_name'))
-    form = GApplicationInProgress()
+    form = GApplicationInProgress_form()
     form.add_inventor_fields(inventor_count)
     if form.validate_on_submit():
-        patent_application = GApplication(applicant_id=current_user.table_id)
+        patent_application = GApplicationInProgress(applicant_id=current_user.table_id)
         patent_application.d_ipc = form.d_ipc.data
         patent_application.ipc_section = form.ipc_section.data
         patent_application.patent_title = form.patent_title.data
@@ -328,9 +345,9 @@ def applicant_apply():
 def applicant_application_manage():  # customer_order_manage
     if current_user.table_name != "Applicant":
         abort(403)
-    pending_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=1).all()
-    rejected_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=2).all()
-    approved_patents = GApplication.query.filter_by(applicant_id=current_user.table_id, status=3).all()
+    pending_patents = GApplicationInProgress.query.filter_by(applicant_id=current_user.table_id, status=1).all()
+    rejected_patents = GApplicationInProgress.query.filter_by(applicant_id=current_user.table_id, status=2).all()
+    approved_patents = GApplicationInProgress.query.filter_by(applicant_id=current_user.table_id, status=3).all()
     return render_template("applicant_patent_in_progress_manage.html", pending=pending_patents,
                            rejected=rejected_patents, approved=approved_patents)
 
@@ -338,9 +355,9 @@ def applicant_application_manage():  # customer_order_manage
 @app.route("/applicant/application_detail/<int:application_table_id>")
 @login_required
 def application_detail(application_table_id):
-    if current_user.table_name != "Applicant":
+    if current_user.table_name != "Applicant" and current_user.table_name != "Inspector":
         abort(403)
-    application_info = GApplication.query.filter_by(table_number=application_table_id).first()
+    application_info = GApplicationInProgress.query.filter_by(table_number=application_table_id).first()
     return render_template('application_detail.html', title='Application_detail', info=application_info)
 
 
@@ -387,6 +404,9 @@ def search_results():
         conditions.append(GPatent.d_ipc == search_params['d_ipc'])
     if search_params.get('wipo_kind'):
         conditions.append(GPatent.wipo_kind == search_params['wipo_kind'])
+    if search_params.get('claims_least'):
+        conditions.append(GPatent.num_claims >= search_params['claims_least'])
+
 
     # 应用普通搜索条件
     if conditions:
@@ -410,6 +430,37 @@ def search_results():
         if inventor_conditions:
             query = query.join(GInventorDetailed, GPatent.patent_number == GInventorDetailed.patent_number)
             query = query.filter(or_(*inventor_conditions))
+
+    # 构建assignee搜索条件并应用
+    assignee_conditions = []
+    if search_params.get('assignee'):
+        assignee_conditions.extend([
+            GAssignee.assignee.like(f'%{search_params["assignee"]}%')
+        ])
+        if assignee_conditions:
+            query = query.join(GAssignee, GPatent.patent_number == GAssignee.patent_number)
+            query = query.filter(and_(*assignee_conditions))
+
+    location = []
+    if search_params.get('country'):
+        location.extend([
+            GLocation.country.like(f'%{search_params["country"]}%')
+        ])
+    if search_params.get('state'):
+        location.extend([
+            GLocation.state.like(f'%{search_params["state"]}%')
+        ])
+    if search_params.get('city'):
+        location.extend([
+            GLocation.city.like(f'%{search_params["city"]}%')
+    ])
+    if search_params.get('county'):
+        location.extend([
+            GLocation.county.like(f'%{search_params["county"]}%')
+    ])
+    if location:
+        query = query.join(GLocation, GPatent.patent_number == GLocation.patent_number)
+        query = query.filter(and_(*location))
 
     results = query.all()
     num = len(results)
@@ -440,8 +491,97 @@ def cite(id):
     return redirect(url_for("home"))
 
 
-@app.route("/cite/<id>")
+@app.route("/inspector/process")
 @login_required
 def inspector_process_applications():
+    if current_user.table_name != "Inspector":
+        abort(403)
+    pending_patents = GApplication.query.filter_by(status=1).all()
+    return render_template("applicant_patent_in_progress_manage.html", pending=pending_patents)
 
-    return redirect(url_for("home"))
+
+
+@app.route("/inspector/process/approve/<application_id>")
+@login_required
+def inspector_approve(application_id):
+    if current_user.table_name != "Inspector":
+        abort(403)
+        # 获取当前年份
+    current_year = datetime.now().year
+    current_time = datetime.now()
+    formatted_date = current_time.date().strftime("%Y-%m-%d")
+
+    pending_patents =GApplicationInProgress.query.filter_by(table_number = application_id).first()
+    pending_patents.status = 3
+    db.session.add(pending_patents)
+    db.session.commit()
+    approved_patent = GPatent()
+    approved_patent.patent_number = f"{formatted_date}/{pending_patents.table_number}"
+    approved_patent.d_ipc = pending_patents.d_ipc
+    approved_patent.ipc_section = pending_patents.ipc_section
+    # 设置application_number为当前年份和table_id的组合
+    approved_patent.application_number = f"{current_year}/{pending_patents.table_number}"
+    approved_patent.patent_type = pending_patents.patent_type
+    approved_patent.patent_date = formatted_date
+    approved_patent.patent_title = pending_patents.patent_title
+    approved_patent.patent_abstract = pending_patents.patent_abstract
+    approved_patent.wipo_kind = pending_patents.wipo_kind
+    approved_patent.num_claims = 0
+    db.session.add(approved_patent)
+    db.session.commit()
+
+    inventor = GInventorGeneral()
+    inventor_names = [pending_patents.inventor_name1, pending_patents.inventor_name2, pending_patents.inventor_name3, 
+                      pending_patents.inventor_name4, pending_patents.inventor_name5, pending_patents.inventor_name6, 
+                      pending_patents.inventor_name7, pending_patents.inventor_name8, pending_patents.inventor_name9]
+    teamsize = sum(1 for name in inventor_names if name)
+    inventor.patent_number = f"{formatted_date}/{pending_patents.table_number}"
+    inventor.team_size = teamsize
+    genders = [pending_patents.male_flag1, pending_patents.male_flag2, pending_patents.male_flag3, 
+            pending_patents.male_flag4, pending_patents.male_flag5, pending_patents.male_flag6, 
+            pending_patents.male_flag7, pending_patents.male_flag8, pending_patents.male_flag9]
+   
+    men_inventors = sum(1 for gender in genders if gender!=0)
+    women_inventors = teamsize-men_inventors
+    inventor.inventors = teamsize
+    inventor.men_inventors = men_inventors
+    inventor.women_inventors = women_inventors
+    db.session.add(inventor)
+    db.session.commit()
+
+    inventordetail = GInventorDetailed()
+    inventordetail.patent_number = f"{formatted_date}/{pending_patents.table_number}"
+    inventordetail.inventor_name1 = pending_patents.inventor_name1
+    inventordetail.inventor_name2 = pending_patents.inventor_name2
+    inventordetail.inventor_name3 = pending_patents.inventor_name3
+    inventordetail.inventor_name4 = pending_patents.inventor_name4
+    inventordetail.inventor_name5 = pending_patents.inventor_name5
+    inventordetail.inventor_name6 = pending_patents.inventor_name6
+    inventordetail.inventor_name7 = pending_patents.inventor_name7
+    inventordetail.inventor_name8 = pending_patents.inventor_name8
+    inventordetail.inventor_name9 = pending_patents.inventor_name9
+    inventordetail.male_flag1 = pending_patents.male_flag1
+    inventordetail.male_flag2 = pending_patents.male_flag2
+    inventordetail.male_flag3 = pending_patents.male_flag3
+    inventordetail.male_flag4 = pending_patents.male_flag4
+    inventordetail.male_flag5 = pending_patents.male_flag5
+    inventordetail.male_flag6 = pending_patents.male_flag6
+    inventordetail.male_flag7 = pending_patents.male_flag7
+    inventordetail.male_flag8 = pending_patents.male_flag8
+    inventordetail.male_flag9 = pending_patents.male_flag9
+    db.session.add(inventordetail)
+    db.session.commit()
+
+    pending_patents = GApplicationInProgress.query.filter_by(status=1).all()
+    return render_template("applicant_patent_in_progress_manage.html", pending=pending_patents)
+
+@app.route("/inspector/process/reject/<application_id>")
+def inspector_reject(application_id):
+    pending_patents = GApplicationInProgress.query.filter_by(table_number = application_id).first()
+    pending_patents.status = 2
+    db.session.add(pending_patents)
+    db.session.commit()
+
+    pending_patents = GApplicationInProgress.query.filter_by(status=1).all()
+    return render_template("applicant_patent_in_progress_manage.html", pending=pending_patents)
+

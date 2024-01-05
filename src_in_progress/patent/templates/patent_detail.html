@@ -6,8 +6,8 @@
         <a>IPC Category : {{ patent_info.ipc_section }}</a><br>
         <a>Patent type: {{ patent_info.patent_type }}</a><br>
         <a>Number of Claim : {{ patent_info.num_claims }}</a><br>
-        <a>Abstract : {{ patent_info.patent_abstract }}</a><br><br>
-        <h4>Inventor Information</h4><br>
+        <a>Abstract : {{ patent_info.patent_abstract }}</a><br>
+        <h2>Inventor Information</h2>
         <a>Team size: {{patent_detail.team_size}}</a><br>
         {% if patent_detail.Inventors %}
             <a>Number of Inventors: {{patent_detail.Inventors}}</a><br>
@@ -92,19 +92,6 @@
             {% else %}
                 <a> (Female)</a><br>
             {% endif %}
-        {% endif %}<br>
-        <h4>More Details</h4>
-        {% if assignee %}
-            <a>Assignee: {{assignee.assignee}}</a><br>
         {% endif %}
-        {% if location.country or location.city or location.state or location.county %}
-            <a>Location: 
-                {% if location.county %}{{ location.county }}{% if location.city or location.state or location.country %}, {% endif %}{% endif %}
-                {% if location.city %}{{ location.city }}{% if location.state or location.country %}, {% endif %}{% endif %}
-                {% if location.state %}{{ location.state }}{% if location.country %}, {% endif %}{% endif %}
-                {% if location.country %}{{ location.country }}{% endif %}
-            </a><br>
-        {% endif %}
-
     </div>
 {% endblock content %}

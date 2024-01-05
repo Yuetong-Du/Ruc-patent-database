@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="content-section">
-    <h1>Patent</h1>
+        <h2>Hello, <span style='color:green'>{{ statement }}</span>!</h2>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        系统时间：<title>当前时间</title>
+        System Time：
+        <title>当前时间</title>
     </head>
     <body>
         <div id="datetime">
@@ -15,24 +16,14 @@
     </body>
 </div>
 
-<div>
-    {% if patents %}
-    {% for patent in patents %}
-    <div class="content-section">
-        <a>Patent Title: {{ patent.patent_title }}</a><br>
-        <a>Patent id : {{ patent.patent_number }}</a><br>
-        <a>IPC section: {{ patent.ipc_section }}</a><br>
-        <a href={{ url_for("patent_detail",patent_id=patent.patent_number) }}>Details</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="{{ url_for('cite', id=patent.patent_number) }}">Claim</a>
-    </div>
-    {% endfor %}
-        {{ pagination.info }}
-        {{ pagination.links }}
-    {% else %}
-    <div class="content-section">
-        <h2>Waiting to get patent applied, so excited!</h2>
-    </div>
-    {% endif %}
+<div class="content-section">
+    <a> As far, there have been </a>
+        <a> <span style='color:red'>{{ user_num }}</span> users, </a>
+        <a> <span style='color:red'>{{ patent_num }}</span> patents. </a><br>
+    <a>You can search for patents you want. </a><br>
+    <a> The dashboard give an overview of patents. </a><br>
+    <br>
+    <a> If you have questions or suggestions, feel free to contact us. </a>
 </div>
 
 {% endblock content %}

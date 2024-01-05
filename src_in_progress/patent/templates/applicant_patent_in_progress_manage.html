@@ -9,7 +9,11 @@
             <font color="blue">
                 <a> Pending</a><br>
             </font>
-            <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
+            <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a>
+            {% if current_user.table_name == "Inspector" %}
+                <a  href="{{ url_for('inspector_approve', application_id = patent.table_number)}}">Approve</a>
+                <a  href="{{ url_for('inspector_reject', application_id = patent.table_number)}}">Reject</a>
+            {% endif %}<br>
             <a>-------------------------------------------------------</a><br>
         {% endfor %}
     {% endif %}
@@ -36,5 +40,9 @@
                     <a href="{{ url_for('application_detail', application_table_id=patent.table_number) }}">Application Detail</a><br>
             <a>-------------------------------------------------------</a><br>
         {% endfor %}
+    {% endif %}
+    {% if not approved and  not rejected and  not pending%}
+        <a> Seems that there is no applications sunmitted. How about applying for one?  </a><br>
+        <a href = "{{url_for('applicant_apply')}}">Apply one now!</a>
     {% endif %}
 {% endblock info %}

@@ -2,21 +2,23 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<title>专利数据看板</title>
+		<title>Dashboard</title>
 		<style>
 			body {
-				margin: 0;
-				background: white;
+				margin: 10;
+				background:white;
 			}
 
 			#title {
 				position: absolute;
-				width: 40%;
+				width: 100%;
 				height: 10%;
 				top: 0;
-				left: 30%;
-				color: black;
-				font-size: 40px;
+				left: 0;
+				color:white;
+				background: #0b1b2e;
+				font-size: 30px;
+				font-family: Arial, sans-serif;
 				justify-content: center;
 				display: flex;
 				align-items: center;
@@ -27,27 +29,34 @@
 				height: 10%;
 				right: 5%;
 				top: 5%;
+				font-size: 20px;
+				font-family: Arial, sans-serif;
 				color: black;
 				font-size: 16px;
 			}
 
 			#c1 {
 				position: absolute;
-				width: 40%;
-				height: 25%;
+				width: 30%;
+				font-size: 20px;
+				font-family: Arial, sans-serif;
+				height: 45%;
 				top: 10%;
-				left: 30%;
-				color: black;
+				left: 35%;
+				color:black;
 				background: white;
 			}
 
 			#c2 {
 				position: absolute;
-				width: 40%;
-				height: 65%;
-				top: 35%;
-				left: 30%;
-				background: white;
+				width: 30%;
+				height: 45%;
+				top: 55%;
+				font-size: 20px;
+				font-family: Arial, sans-serif;
+				left: 35%;
+				color:black;
+				background:white;
 			}
 
 			#l1 {
@@ -55,8 +64,11 @@
 				width: 30%;
 				height: 45%;
 				top: 10%;
-				left: 0%;
-				background: white;
+				left: 3%;
+				color:black;
+				background:white;
+				font-size: 20px;
+				font-family: Arial, sans-serif;
 			}
 
 			#l2 {
@@ -64,8 +76,11 @@
 				width: 30%;
 				height: 45%;
 				top: 55%;
-				left: 0%;
-				background: white;
+				left: 3%;
+				color:black;
+				background:white;
+				font-size: 20px;
+				font-family: Arial, sans-serif;
 			}
 
 			#r1 {
@@ -73,8 +88,11 @@
 				width: 30%;
 				height: 45%;
 				top: 10%;
-				right: 0%;
-				background: white;
+				right: 3%;
+				color:black;
+				background:white;
+				font-size: 20px;
+				font-family: Arial, sans-serif;
 			}
 
 			#r2 {
@@ -82,8 +100,11 @@
 				width: 30%;
 				height: 45%;
 				top: 55%;
-				right: 0%;
-				background: white;
+				right: 3%;
+				color:black;
+				background:white;
+				font-size: 20px;
+				font-family: Arial, sans-serif;
 			}
 		</style>
 		<script>
@@ -94,28 +115,31 @@
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	</head>
 	<body>
-		<div id="title">专利数据看板</div>
+		<div id="title">Real-time Dashboard</div>
 		<div id="time"><span id="time"> </span></div>
-		<div id="l1">
-			<a>专利数量国家分布</a>
-			<canvas id="patentChart" width="400" height="200"></canvas>
+		<div id="l1" style="text-align: left;">
+			Patent number by country
+			<canvas id="patentChart" width=240 height=180 ></canvas>
 		</div>
-		<div id="l2">
-			<a>专利数量类别分布</a>
-			<canvas id="ipcChart" width="400" height="200"></canvas>
+		<div id="l2" style="text-align: left;">
+			Patent number by section
+			<canvas id="ipcChart" width="240" height="180"></canvas>
 		</div>
-		<div id="c1">我是中1</div>
-		<div id="c2">
-			<a>专利申请年总量</a>
-			<canvas id="yearChart" width="400" height="200"></canvas>
+		<div id="c1" style="text-align: left;">
+
+			<canvas id="figure" width="400" height="300"></canvas>
 		</div>
-		<div id="r1">
-			<a>专利团队人数分布</a>
-			<canvas id="team_member_num_Chart" width="400" height="200"></canvas>
+		<div id="c2" style="text-align: left;">
+			Application number by year
+			<canvas id="yearChart" width="400" height="300"></canvas>
 		</div>
-		<div id="r2">
-			<a>专利声明数量分布</a>
-			<canvas id="claimChart" width="400" height="200"></canvas>
+		<div id="r1" style="text-align: left;">
+			Team size distribution
+			<canvas id="team_member_num_Chart" width="400" height="300"></canvas>
+		</div>
+		<div id="r2" style="text-align: left;">
+			Claim number distribution
+			<canvas id="claimChart" width="400" height="300"></canvas>
 		</div>
 		
 		<script>
@@ -127,40 +151,92 @@
 				data: {
 					labels: countries,
 					datasets: [{
-						label: 'patent数量',
+						label: 'Patent number by country',
 						data: counts,
-						backgroundColor: [
-							'rgba(255, 99, 132, 0.2)',  // 红色
-							'rgba(54, 162, 235, 0.2)',  // 蓝色
-							'rgba(255, 206, 86, 0.2)',  // 黄色
-							'rgba(75, 192, 192, 0.2)',  // 青色
-							'rgba(153, 102, 255, 0.2)', // 紫色
-							'rgba(255, 159, 64, 0.2)',  // 橙色
-							'rgba(199, 199, 199, 0.2)', // 灰色
-							'rgba(83, 102, 255, 0.2)'   // 深蓝色
-						],
-						borderColor: [
-							'rgba(255, 99, 132, 1)',
-							'rgba(54, 162, 235, 1)',
-							'rgba(255, 206, 86, 1)',
-							'rgba(75, 192, 192, 1)',
-							'rgba(153, 102, 255, 1)',
-							'rgba(255, 159, 64, 1)',
-							'rgba(159, 159, 159, 1)',
-							'rgba(83, 102, 255, 1)'
-						],
+						backgroundColor: '#29adef',  // 红色
+						borderColor:'#29adef',
 						borderWidth: 1
 					}]
 				},
 				options: {
-					scales: {
-						y: {
-							display: true,
-							beginAtZero: true
-						}
-					}
 				}
 			});
+		</script>
+
+		<script>
+			// 获取画布元素
+			var canvas = document.getElementById('figure');
+			var ctx = canvas.getContext('2d');
+
+			// 设置文本样式
+			ctx.font = '20px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = 'black'; // 设置文本颜色
+
+			// 绘制中文文本
+			var Line_0 = 'Currently, we have ...';
+			ctx.fillText(Line_0, 1, 20);
+
+			ctx.font = '20px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = 'black'; // 设置文本颜色
+
+			var Line_1 = 'Patent：';
+			ctx.fillText(Line_1, 50, 70);
+
+			ctx.font = '30px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = '#29adef'; // 设置文本颜色
+			var Line_1_1={{ result_middle1 | map(attribute='Patent_num') | list | tojson }}
+			ctx.fillText(Line_1_1, 180, 70);
+
+			ctx.font = '20px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = 'black'; // 设置文本颜色
+			var Line_2 = 'Application：';
+			ctx.fillText(Line_2, 50, 110);
+
+			ctx.font = '30px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = '#29adef'; // 设置文本颜色
+			var Line_2_2 = {{ result_middle1e | map(attribute='Appid') | list | tojson }};
+			ctx.fillText(Line_2_2, 180, 110);
+
+			ctx.font = '20px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = 'black'; // 设置文本颜色
+			var Line_3 = 'Visitor：';
+			ctx.fillText(Line_3, 50, 150);
+
+			ctx.font = '30px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = '#29adef'; // 设置文本颜色
+			var Line_3_2 = {{ result_middle1c | map(attribute='Vid') | list | tojson }};
+			ctx.fillText(Line_3_2, 180, 150);
+			
+			ctx.font = '20px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = 'black'; // 设置文本颜色
+			var Line_4 = 'Applicant：';
+			ctx.fillText(Line_4, 50, 190);
+
+			ctx.font = '30px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = '#29adef'; // 设置文本颜色
+			var Line_3_2 = {{ result_middle1a | map(attribute='Aid') | list | tojson }};
+			ctx.fillText(Line_3_2, 180, 190);
+
+			ctx.font = '20px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = 'black'; // 设置文本颜色
+			var Line_5 = 'Inspector：';
+			ctx.fillText(Line_5, 50, 230);
+
+			ctx.font = '30px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = '#29adef'; // 设置文本颜色
+			var Line_3_2 = {{ result_middle1d | map(attribute='Iid') | list | tojson }};
+			ctx.fillText(Line_3_2, 180, 230);
+
+			ctx.font = '20px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = 'black'; // 设置文本颜色
+			var Line_5 = 'Users：';
+			ctx.fillText(Line_5, 50, 270);
+
+			ctx.font = '30px Arial'; // 设置字体大小和字体类型
+			ctx.fillStyle = '#29adef'; // 设置文本颜色
+			var Line_3_2 = {{ result_middle1b | map(attribute='Uid') | list | tojson }};
+			ctx.fillText(Line_3_2, 180, 270);
+
 		</script>
 		
 		<script>
@@ -172,28 +248,10 @@
 				data: {
 					labels: team_member_num,
 					datasets: [{
-						label: '团队人数',
+						label: 'Patent number by team size',
 						data: counts,
-						backgroundColor: [
-							'rgba(255, 99, 132, 0.2)',  // 红色
-							'rgba(54, 162, 235, 0.2)',  // 蓝色
-							'rgba(255, 206, 86, 0.2)',  // 黄色
-							'rgba(75, 192, 192, 0.2)',  // 青色
-							'rgba(153, 102, 255, 0.2)', // 紫色
-							'rgba(255, 159, 64, 0.2)',  // 橙色
-							'rgba(199, 199, 199, 0.2)', // 灰色
-							'rgba(83, 102, 255, 0.2)'   // 深蓝色
-						],
-						borderColor: [
-							'rgba(255, 99, 132, 1)',
-							'rgba(54, 162, 235, 1)',
-							'rgba(255, 206, 86, 1)',
-							'rgba(75, 192, 192, 1)',
-							'rgba(153, 102, 255, 1)',
-							'rgba(255, 159, 64, 1)',
-							'rgba(159, 159, 159, 1)',
-							'rgba(83, 102, 255, 1)'
-						],
+						backgroundColor: '#29adef',  
+						borderColor:'#29adef',
 						borderWidth: 1
 					}]
 				},
@@ -202,6 +260,9 @@
 						y: {
 							beginAtZero: true
 						}
+					},
+					legend: {
+						display: false // 不显示图例
 					}
 				}
 			});
@@ -216,29 +277,11 @@
 				data: {
 					labels: ipcs,
 					datasets: [{
-						label: 'section数量',
+						label: 'Patent number by ipc section',
 						data: ipccounts,
-						backgroundColor: [
-							'rgba(255, 99, 132, 0.2)',  // 红色
-							'rgba(54, 162, 235, 0.2)',  // 蓝色
-							'rgba(255, 206, 86, 0.2)',  // 黄色
-							'rgba(75, 192, 192, 0.2)',  // 青色
-							'rgba(153, 102, 255, 0.2)', // 紫色
-							'rgba(255, 159, 64, 0.2)',  // 橙色
-							'rgba(199, 199, 199, 0.2)', // 灰色
-							'rgba(83, 102, 255, 0.2)'   // 深蓝色
-						],
-						borderColor: [
-							'rgba(255, 99, 132, 1)',
-							'rgba(54, 162, 235, 1)',
-							'rgba(255, 206, 86, 1)',
-							'rgba(75, 192, 192, 1)',
-							'rgba(153, 102, 255, 1)',
-							'rgba(255, 159, 64, 1)',
-							'rgba(159, 159, 159, 1)',
-							'rgba(83, 102, 255, 1)'
-						],
-						borderWidth: 1
+						backgroundColor: '#29adef',  // 红色
+						borderColor:'#29adef',
+						borderWidth:1
 					}]
 				},
 				options: {
@@ -247,6 +290,9 @@
 							display: true,
 							beginAtZero: true
 						}
+					},
+					legend: {
+						display: false // 不显示图例
 					}
 				}
 			});
@@ -261,9 +307,10 @@
 				data: {
 					labels: years,
 					datasets: [{
-						label: 'application数量',
+						label: 'Patent application by year',
 						data: counts,
-						borderColor: 'rgba(75, 192, 192, 1)',
+						backgroundColor:'#29adef',  // 红色
+						borderColor:'#29adef',
 						borderWidth: 1,
 						fill:false
 					}]
@@ -274,6 +321,9 @@
 							display: true,
 							beginAtZero: true
 						}
+					},
+					legend: {
+						display: false // 不显示图例
 					}
 				}
 			});
@@ -288,31 +338,30 @@
 				data: {
 					labels: claims,
 					datasets: [{
-						label: 'claim数量',
+						label: 'Claim number',
 						data: counts,
-						backgroundColor:'rgba(255, 99, 132, 0.2)',  // 红色
-						borderColor:'rgba(255, 99, 132, 1)',
+						backgroundColor: '#29adef',  // 红色
+						borderColor:'#29adef',
 						borderWidth: 1
 					}]
 				},
 				options: {
-					scales: {
-						y: {
-							display: true,
-							beginAtZero: true
-						}
-						x: {
-							ticks: {
-								maxRotation:0,
-								maxTicksLimit:10
-							}
-						}
+					legend: {
+						display: false
 					}
 				}
 			});
 		</script>
-
+		<script>
+			document.addEventListener('DOMContentLoaded', (event) => {
+			  var highlighterTool = document.getElementById('highlighter--hover-tools');
+			  if (highlighterTool) {
+				highlighterTool.parentNode.removeChild(highlighterTool);
+			  }
+			});
+		  </script>		  
 	</body>
 </html>
 
+  
 
