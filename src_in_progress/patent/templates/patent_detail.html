@@ -7,6 +7,23 @@
         <a>Patent type: {{ patent_info.patent_type }}</a><br>
         <a>Number of Claim : {{ patent_info.num_claims }}</a><br>
         <a>Abstract : {{ patent_info.patent_abstract }}</a><br>
+        {% if assignee %}
+            <a>Assignee: {{ assignee.assignee }}</a><br>
+        {% endif %}
+        {% if location %}
+            {% if location.country %}
+                <a> Country: {{location.country}}</a><br>
+            {% endif %}
+            {% if location.state %}
+                <a> State: {{location.state}}</a><br>
+            {% endif %}
+            {% if location.city %}
+                <a> City: {{location.city}}</a><br>
+            {% endif %}
+            {% if location.county %}
+                <a> County: {{location.county}}</a><br>
+            {% endif %}
+        {% endif %}
         <h2>Inventor Information</h2>
         <a>Team size: {{patent_detail.team_size}}</a><br>
         {% if patent_detail.Inventors %}

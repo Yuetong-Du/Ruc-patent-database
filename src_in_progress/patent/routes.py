@@ -151,8 +151,16 @@ def patent_detail(patent_id):
     patent_info = GPatent.query.filter_by(patent_number=patent_id).first()
     patent_detail = GInventorGeneral.query.filter_by(patent_number=patent_id).first()
     patent_super_detail = GInventorDetailed.query.filter_by(patent_number=patent_id).first()
-    return render_template('patent_detail.html', title='Patent_detail', patent_info=patent_info,
-                           patent_detail=patent_detail, super_detail=patent_super_detail)
+    assignee = GAssignee.query.filter_by(patent_number = patent_id).first()
+    location = GLocation.query.filter_by(patent_number = patent_id).first()
+    flash(location.country,"success")
+    return render_template('patent_detail.html', 
+                           title='Patent_detail', 
+                           patent_info=patent_info,
+                           patent_detail=patent_detail, 
+                           super_detail=patent_super_detail,
+                           assignee = assignee,
+                           location = location)
 
 
 @app.route("/applicant/<string:username>/account")  # asking applicants to fill in detailed info
@@ -375,7 +383,12 @@ def patent_search():
             'd_ipc': form.d_ipc.data,
             'wipo_kind': form.wipo_kind.data,
             'inventor': form.inventor.data,
-            'per_page': form.per_page.data
+            'per_page': form.per_page.data,
+            'assignee': form.assignee.data,
+            'country':form.country.data,
+            'state':form.state.data,
+            'city':form.city.data,
+            'county':form.county.data
         }
 
         # 重定向到结果显示视图
@@ -442,7 +455,7 @@ def search_results():
             query = query.filter(and_(*assignee_conditions))
 
     location = []
-    if search_params.get('country'):
+    if search_params.get('country')!= 'NA':
         location.extend([
             GLocation.country.like(f'%{search_params["country"]}%')
         ])

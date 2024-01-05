@@ -293,7 +293,8 @@ class GPatentSearch(FlaskForm):
     country = SelectField(
         'Country',
         choices = 
-            [('Aruba', 'Aruba'),
+                [('NA','Any will be fine!'),
+                ('Aruba', 'Aruba'),
                 ('Antigua and Barbuda', 'Antigua and Barbuda'),
                 ('Anguilla', 'Anguilla'),
                 ('Argentina', 'Argentina'),
