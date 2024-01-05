@@ -107,11 +107,7 @@ class GInventorDetailed(db.Model):
     inventor_id9 = db.Column(db.String(128))
     male_flag9 = db.Column(db.Integer)
     inventor_name9 = db.Column(db.String(128))
-    assignee = db.Column(db.String(50))
-    country = db.Column(db.String(50))
-    city = db.Column(db.String(50))
-    assignee = db.Column(db.String(50))
-    assignee = db.Column(db.String(50))
+    
 
 
 
