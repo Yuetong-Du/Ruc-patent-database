@@ -153,7 +153,6 @@ def patent_detail(patent_id):
     patent_super_detail = GInventorDetailed.query.filter_by(patent_number=patent_id).first()
     assignee = GAssignee.query.filter_by(patent_number = patent_id).first()
     location = GLocation.query.filter_by(patent_number = patent_id).first()
-    flash(location.country,"success")
     return render_template('patent_detail.html', 
                            title='Patent_detail', 
                            patent_info=patent_info,

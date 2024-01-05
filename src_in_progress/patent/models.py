@@ -36,7 +36,6 @@ class Visitor(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     telephone = db.Column(db.String(20), nullable=False, default="null")
-    # products = db.relationship("Product",backref="supplier",lazy=True)
 
 
 class Inspector(db.Model, UserMixin):
