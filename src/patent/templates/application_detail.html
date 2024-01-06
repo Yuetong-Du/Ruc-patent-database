@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <h2>{{ info.patent_title }}</h2><br>
+        <a>IPC Section : {{ info.ipc_section }}</a><br>
+        <a>Patent type: {{ info.patent_type }}</a><br>
+        <a>Wipo Kind : {{ info.wipo_kind }}</a><br>
+        <a>Abstract : {{ info.patent_abstract }}</a><br>
+        <a>Assignee : {{ info.assignee }}</a><br>
+        {% if info.country%}
+            <a>Country : {{ info.country }}</a><br>
+        {% endif %}
+        {% if info.state%}
+            <a>State : {{ info.state }}</a><br>
+        {% endif %}
+        {% if info.country%}
+            <a>City : {{ info.city }}</a><br>
+        {% endif %}
+        {% if info.country%}
+            <a>County : {{ info.county }}</a><br>
+        {% endif %}
+
+        <h2>Inventor Information</h2>
+        <a>Inventor:</a><br>
+        {% if info.inventor_name1 %}
+            <a>     {{info.inventor_name1}}</a>
+            {% if info.male_flag1 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name2 %}
+            <a>     {{info.inventor_name2}}</a>
+            {% if info.male_flag2 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name3 %}
+            <a>     {{info.inventor_name3}}</a>
+            {% if info.male_flag3 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name4 %}
+            <a>     {{info.inventor_name4}}</a>
+            {% if info.male_flag4 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name5 %}
+            <a>     {{info.inventor_name5}}</a>
+            {% if info.male_flag5 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name6 %}
+            <a>     {{info.inventor_name6}}</a>
+            {% if info.male_flag6 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name7 %}
+            <a>     {{info.inventor_name7}}</a>
+            {% if info.male_flag7 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name8 %}
+            <a>     {{super_detail.inventor_name8}}</a>
+            {% if info.male_flag8 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name8 %}
+            <a>     {{info.inventor_name8}}</a>
+            {% if info.male_flag8 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+        {% if info.inventor_name9 %}
+            <a>     {{info.inventor_name9}}</a>
+            {% if info.male_flag9 %}
+                <a> (Male)</a><br>
+            {% else %}
+                <a> (Female)</a><br>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock content %}
